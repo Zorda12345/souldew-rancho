@@ -1,10 +1,10 @@
 // Pelea en tiempo real sobre el prado. Aquí se decide quién ataca a quién y cuándo;
 // cuánto daño hace cada golpe lo calculan las reglas de battle/damage.ts.
-import { calcDamage, createFighter, effectiveStat, isPhysical, resolveAttack, type Fighter } from "../battle/damage.ts";
+import { createFighter, effectiveStat, isPhysical, resolveAttack, type Fighter } from "../battle/damage.ts";
+import { STRUGGLE, chooseMove, pickTarget, type Plan } from "../battle/ai.ts";
 import { DASH, hitstop, knockback, moveSpeed, shake, type HitInfo } from "../battle/motion.ts";
-import { MOVES, type Move } from "../data/moves.ts";
+import type { Move } from "../data/moves.ts";
 import type { StatKey } from "../data/stats.ts";
-import { TYPES, effectivenessAgainst, type TypeId } from "../data/types.ts";
 import type { Critter, Rect } from "./critter.ts";
 import type { Fx } from "./fx.ts";
 
@@ -13,13 +13,9 @@ const SHOT = 120; // alcance de un ataque a distancia
 const QUAKE = 66; // radio de un ataque de área
 const STAMINA = 3; // aguante: los PS de combate son el triple de los reales (ajuste del rancho, no del juego)
 const MAX_SECONDS = 150; // por si una pelea no acabara nunca
-// Si un Pokémon no tiene ningún ataque conocido, pelea con un golpe básico.
-const STRUGGLE: Move = { type: "normal", power: 40, accuracy: 100 };
 
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
-const typeColor = (type: TypeId) => parseInt(TYPES[type].color.slice(1), 16);
 
-interface Plan { name: string; move: Move }
 interface Point { x: number; y: number }
 interface Unit {
   critter: Critter;
@@ -77,7 +73,7 @@ export class Arena {
       fighter.hp = fighter.stats.hp;
       const unit: Unit = {
         critter, fighter, name: critter.pokemon.nickname,
-        target: null, plan: { name: "Forcejeo", move: STRUGGLE }, cooldown: rand(0.6, 1.6), busy: 0, retarget: 0, heals: 0,
+        target: null, plan: STRUGGLE, cooldown: rand(0.6, 1.6), busy: 0, retarget: 0, heals: 0,
         dash: 0, dashDir: { x: 0, y: 0 }, dashReady: rand(1, DASH.cooldown), recover: 0,
       };
       return unit;
@@ -202,40 +198,25 @@ export class Arena {
     this.pending.push({ at: this.time + seconds, run });
   }
 
+  /** Elige rival con la IA (battle/ai.ts): a quién puede hacer más daño, a quién puede rematar y quién le amenaza. */
   private pickTarget(unit: Unit): void {
     const me = unit.critter.view;
-    const others = this.alive()
-      .filter((u) => u !== unit)
-      .sort((a, b) => Math.hypot(a.critter.view.x - me.x, a.critter.view.y - me.y) - Math.hypot(b.critter.view.x - me.x, b.critter.view.y - me.y));
-    // Casi siempre va a por el más cercano; a veces cambia de idea.
-    unit.target = others.length === 0 ? null : Math.random() < 0.7 ? others[0] : others[Math.floor(Math.random() * others.length)];
-    unit.retarget = rand(4, 7);
+    const others = this.alive().filter((u) => u !== unit);
+    const index = pickTarget(
+      unit.fighter,
+      others.map((u) => ({
+        fighter: u.fighter,
+        distance: Math.hypot(u.critter.view.x - me.x, u.critter.view.y - me.y),
+        hunters: this.units.filter((h) => h !== unit && h.fighter.hp > 0 && h.target === u).length,
+      })),
+    );
+    unit.target = others[index] ?? null;
+    unit.retarget = rand(2.5, 4); // cada poco se replantea el rival (alguien puede haberse quedado tocado)
     if (unit.target) unit.plan = this.choose(unit, unit.target);
   }
 
-  /** Elige el próximo movimiento: curarse si va mal, a veces subirse estadísticas y, si no, el ataque que más daño haría. */
   private choose(unit: Unit, target: Unit): Plan {
-    const known = unit.fighter.pokemon.moves.map((m) => ({ name: m.name, move: MOVES[m.name] })).filter((p) => p.move !== undefined);
-    const heal = known.find((p) => p.move.heal);
-    if (heal && unit.heals < 2 && unit.fighter.hp < unit.fighter.stats.hp * 0.4 && Math.random() < 0.7) return heal;
-    const boost = known.find((p) => p.move.boost && Object.keys(p.move.boost).some((k) => (unit.fighter.stages[k as StatKey] ?? 0) < 2));
-    if (boost && Math.random() < 0.18) return boost;
-
-    const attacks = known.filter((p) => p.move.power > 0);
-    if (attacks.length === 0) return { name: "Forcejeo", move: STRUGGLE };
-    if (Math.random() < 0.2) return attacks[Math.floor(Math.random() * attacks.length)]; // un poco de variedad
-    const expected = ({ move }: Plan) => {
-      const physical = isPhysical(move.type);
-      return calcDamage({
-        level: unit.fighter.level, power: move.power,
-        attack: effectiveStat(unit.fighter, physical ? "atk" : "spa"),
-        defense: effectiveStat(target.fighter, physical ? "def" : "spd"),
-        stab: unit.fighter.types.includes(move.type),
-        effectiveness: effectivenessAgainst(move.type, target.fighter.types),
-        critical: false, roll: 92,
-      }) * ((move.accuracy ?? 100) / 100);
-    };
-    return attacks.reduce((best, p) => (expected(p) > expected(best) ? p : best));
+    return chooseMove(unit.fighter, target.fighter, { heals: unit.heals });
   }
 
   private act(unit: Unit, target: Unit): void {
@@ -252,11 +233,14 @@ export class Arena {
       this.later(0.2, () => this.selfEffect(unit, move));
     } else if (move.area) {
       this.later(0.25, () => {
-        this.fx.wave(typeColor(move.type), me, QUAKE);
+        this.fx.wave(move.type, me, QUAKE);
         const reached = this.alive().filter((u) => u !== unit && Math.hypot(u.critter.view.x - me.x, u.critter.view.y - me.y) <= QUAKE);
         for (const victim of reached) this.strike(unit, victim, name, move, reached.length > 1);
       });
     } else if (isPhysical(move.type)) {
+      // Embestida: se lanza hacia el rival justo antes de golpear
+      const d = Math.hypot(foe.x - me.x, foe.y - me.y) || 1;
+      unit.critter.nudge(((foe.x - me.x) / d) * 150, ((foe.y - me.y) / d) * 150);
       this.maybeDodge(target, me);
       this.later(0.25, () => {
         // Si se ha apartado a tiempo (dash), el golpe da en el aire.
@@ -265,15 +249,15 @@ export class Arena {
           this.fx.text("esquiva", { x: now.x, y: now.y }, 0xebe6da);
           return;
         }
-        this.fx.impact(typeColor(move.type), { x: now.x, y: now.y });
+        this.fx.hitFx(move.type, { x: now.x, y: now.y });
         this.strike(unit, target, name, move, false);
       });
     } else {
       const travel = Math.hypot(foe.x - me.x, foe.y - me.y) / 200;
       this.maybeDodge(target, me);
-      this.later(0.2, () => this.fx.projectile(typeColor(move.type), { x: me.x, y: me.y - 4 }, { x: foe.x, y: foe.y - 4 }, move.power >= 110 ? 4 : 3, travel));
+      this.later(0.2, () => this.fx.shot(move.type, { x: me.x, y: me.y - 4 }, { x: foe.x, y: foe.y - 4 }, move.power >= 110 ? 4 : 3, travel));
       this.later(0.2 + travel, () => {
-        this.fx.impact(typeColor(move.type), foe);
+        this.fx.hitFx(move.type, foe);
         // El proyectil va adonde estaba: si se ha movido lo bastante, no le da.
         const now = target.critter.view;
         if (Math.hypot(now.x - foe.x, now.y - foe.y) > 16) {

@@ -345,6 +345,12 @@ export class Critter {
     this.flashTime = 0.14;
   }
 
+  /** Impulso sin destello (embestida de un ataque físico): mismo deslizamiento que un empujón. */
+  nudge(vx: number, vy: number): void {
+    this.knock.vx += vx;
+    this.knock.vy += vy;
+  }
+
   /** ¿Sigue retrocediendo por un golpe? Mientras tanto no puede moverse por su cuenta. */
   get staggered(): boolean {
     return this.knock.vx !== 0 || this.knock.vy !== 0;
