@@ -1,56 +1,62 @@
-/* Tokens de diseño: la única fuente de colores, tipografías y medidas. Ver docs/design-system.md */
+/* Tokens del rancho dentro de souldew: los mismos valores que web/styles.css de la app para que el rancho
+   parezca parte de ella. Las fuentes las pone la app (/assets/fonts/fonts.css, enlazado en index.html).
+   html[data-theme] se copia del documento padre (src/main.ts), así los esquemas de color de Ajustes también valen aquí. */
 :root {
-  /* Materiales */
-  --pergamino: #f5e3b3;
-  --pergamino-claro: #fcf3d9;
-  --pergamino-sombra: #e2c98c;
-  --tinta: #3b2416;
-  --tinta-suave: #7a5a3e;
-  --madera: #a06a35;
-  --madera-oscura: #5c3a17;
-  --madera-clara: #c98f52;
+  --shell: #1b1a1f;
+  --shell-2: #222128;
+  --shell-3: #2a2931;
+  --shell-4: #33323b;
+  --edge: #393842;
+  --edge-hi: #4a4954;
+  --ink: #ebe6da;
+  --ink-2: #a9a59b;
+  --ink-3: #938f87;
 
-  /* Acentos */
-  --laguna: #1f7a80; /* interacción y selección */
-  --laguna-oscura: #145a5f;
-  --oro: #f2b632; /* destacado, shiny, PP */
-  --sube: #c8402f; /* estadística que sube con la naturaleza */
-  --baja: #2f6fb5; /* estadística que baja */
+  --tri: #6fb39b;   /* bien / vivo */
+  --cir: #dc7268;   /* peligro */
+  --crs: #7f9ddb;   /* información */
+  --warn: #e1b05a;  /* destacado: rey, shiny, PP */
+  --ok-ink: #9ed3bf;
+  --bad-ink: #ef9a90;
+  --focus: #7f9ddb;
+
+  /* Naturaleza: la estadística que sube, en rojo; la que baja, en azul (como en los juegos) */
+  --sube: var(--bad-ink);
+  --baja: var(--crs);
 
   /* Escala de valor de una estadística, de floja a excelente */
-  --valor-1: #d9503a;
-  --valor-2: #e8913a;
-  --valor-3: #e8c53a;
-  --valor-4: #7fbf4a;
-  --valor-5: #2fa58c;
+  --valor-1: #d9655a;
+  --valor-2: #e0915a;
+  --valor-3: #d9bf55;
+  --valor-4: #8fbf5f;
+  --valor-5: #4fb39b;
 
-  /* Tipografía */
-  --fuente-pixel: "Pixelify Sans Variable", "Rubik Variable", system-ui, sans-serif;
-  --fuente-texto: "Rubik Variable", system-ui, "Segoe UI", sans-serif;
+  --r-l: 12px;
+  --r-m: 8px;
+  --r-s: 5px;
+  --font-body: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-title: 'Pixelify Sans', 'IBM Plex Sans', system-ui, sans-serif; /* solo títulos de 18 px o más, nunca números */
+  --press: 0 2px 0 #0b0a0d, inset 0 1px 0 #ffffff12;
+  --panel-shadow: inset 0 1px 0 #ffffff08, 0 1px 0 #0006, 0 8px 24px #0005;
 
-  /* Espaciado: múltiplos de 4 px */
   --e1: 4px;
   --e2: 8px;
   --e3: 12px;
   --e4: 16px;
   --e6: 24px;
+  color-scheme: dark;
+}
 
-  /* Marcos */
-  --radio-marco: 14px;
-  --radio-interior: 8px;
-  --borde-marco: 3px solid var(--madera-oscura);
-  --sombra-marco: 0 4px 0 rgb(59 36 22 / 0.45); /* sombra dura, sin difuminar: el toque pixel */
-
-  /* Soul Link: tema oscuro tipo app de escritorio (inspirado en souldew) */
-  --sl-fondo: #121219;
-  --sl-lateral: #17171f;
-  --sl-panel: #1d1d27;
-  --sl-elevado: #252531;
-  --sl-borde: #33333f;
-  --sl-texto: #ecebf3;
-  --sl-suave: #9d9aae;
-  --sl-acento: #a99cff; /* selección, foco, enlaces */
-  --sl-vivo: #8fd47a;
-  --sl-caido: #f07f72;
-  --sl-espera: #e8c661;
+/* Esquemas de color de souldew (Ajustes › Aspecto) */
+html[data-theme='contrast'] {
+  --shell: #000; --shell-2: #0c0c0f; --shell-3: #17171c; --shell-4: #22222a;
+  --edge: #77757f; --edge-hi: #a6a3ae;
+  --ink: #ffffff; --ink-2: #e6e2d8; --ink-3: #c4c0b6;
+  --tri: #4fe0a8; --cir: #ff6b5e; --warn: #ffd34d; --crs: #8fb3ff;
+  --ok-ink: #a8ffdd; --bad-ink: #ffc2bb; --focus: #ffd34d;
+}
+html[data-theme='deutan'] {
+  --tri: #3aa7e8; --cir: #e8731c; --warn: #f0d84a; --crs: #9db8ff;
+  --ok-ink: #a9d9f7; --bad-ink: #ffc08f; --focus: #f0d84a;
+  --valor-1: #e8731c; --valor-5: #3aa7e8;
 }

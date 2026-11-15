@@ -84,7 +84,7 @@ export class Fx {
   text(content: string, at: Point, color: number): void {
     const label = new Text({
       text: content,
-      style: { fontFamily: "Rubik Variable, sans-serif", fontSize: 8, fontWeight: "700", fill: color, stroke: { color: 0xffffff, width: 2 } },
+      style: { fontFamily: "IBM Plex Sans, sans-serif", fontSize: 8, fontWeight: "700", fill: color, stroke: { color: 0xffffff, width: 2 } },
       resolution: 6,
     });
     label.anchor.set(0.5);

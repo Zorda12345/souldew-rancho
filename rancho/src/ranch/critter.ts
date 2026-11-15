@@ -210,14 +210,14 @@ export class Critter {
     if (on && !this.label) {
       const text = new Text({
         text: `${this.pokemon.nickname}  Nv. ${this.pokemon.level}`,
-        style: { fontFamily: "Rubik Variable, sans-serif", fontSize: 7, fontWeight: "600", fill: 0x3b2416 },
+        style: { fontFamily: "IBM Plex Sans, sans-serif", fontSize: 7, fontWeight: "600", fill: 0xebe6da },
         resolution: 6,
       });
       text.anchor.set(0.5);
       const bg = new Graphics()
         .roundRect(-text.width / 2 - 3, -text.height / 2 - 1.5, text.width + 6, text.height + 3, 3)
-        .fill(0xfcf3d9)
-        .stroke({ width: 1, color: 0x5c3a17 });
+        .fill({ color: 0x222128, alpha: 0.94 })
+        .stroke({ width: 1, color: 0x0f0e12 });
       this.label = new Container();
       this.label.addChild(bg, text);
       this.label.y = this.labelY;
@@ -338,9 +338,9 @@ export class Critter {
       this.hpBar.y = this.topY - 5;
       this.view.addChild(this.hpBar);
     }
-    const color = ratio > 0.5 ? 0x7fbf4a : ratio > 0.2 ? 0xe8c53a : 0xd9503a;
+    const color = ratio > 0.5 ? 0x6fb39b : ratio > 0.2 ? 0xe1b05a : 0xdc7268;
     this.hpBar.visible = true;
-    this.hpBar.clear().rect(-10.5, -0.5, 21, 4).fill(0x3b2416).rect(-10, 0, 20, 3).fill(0xfcf3d9);
+    this.hpBar.clear().rect(-10.5, -0.5, 21, 4).fill(0x0f0e12).rect(-10, 0, 20, 3).fill(0x33323b);
     if (ratio > 0) this.hpBar.rect(-10, 0, Math.max(1, 20 * ratio), 3).fill(color);
   }
 
