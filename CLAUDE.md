@@ -31,5 +31,5 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
 
 ## Estado
 - Fase 1 (clonar y arrancar) y fase 2 (rancho como vista) hechas.
-- Mejoras del rancho (orden acordado, parar tras cada una): 1) aspecto de souldew HECHA (tokens de la app en `rancho/src/tokens.css`, fuentes de `/assets/fonts/fonts.css`, sigue `data-theme` del padre); 2) 3 escenarios por caja (prado, playa, bosque nevado); 3) peleas: movimiento por Velocidad base, dash con recarga, retroceso y destello al recibir golpe; 4) IA de objetivo y ataque + animaciones por tipo; 5) datos de la run de souldew.
+- Mejoras del rancho (orden acordado, parar tras cada una): 1) aspecto de souldew HECHA (tokens de la app en `rancho/src/tokens.css`, fuentes de `/assets/fonts/fonts.css`, sigue `data-theme` del padre); 2) 3 escenarios por caja HECHA (`rancho/src/ranch/scenery.ts`: prado, playa, nieve; misma geometría WATER/SPOT, cada uno con `homes` por tipo; selector en el letrero, localStorage `rancho.escenarios`); 3) peleas: movimiento por Velocidad base, dash con recarga, retroceso y destello al recibir golpe; 4) IA de objetivo y ataque + animaciones por tipo; 5) datos de la run de souldew.
 - Siguiente: fase 3, que el rancho muestre los Pokémon de la run de souldew en vez del mock de Rojo Fuego.

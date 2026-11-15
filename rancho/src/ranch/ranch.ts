@@ -1,19 +1,16 @@
 // El escenario: césped, un prado con la caja visible y el bucle del juego.
-import { Container, Graphics, type Application } from "pixi.js";
+import { Container, type Application } from "pixi.js";
 import type { Pokemon } from "../data/schema.ts";
 import { SPECIES } from "../data/species.ts";
 import { natureEffect } from "../data/stats.ts";
-import { Critter, MIN_SPEED, insideEllipse, pointInEllipse, type Ellipse, type Environment, type Rect } from "./critter.ts";
+import { Critter, MIN_SPEED, type Environment, type Rect } from "./critter.ts";
+import { H, W, buildScenery, type SceneId, type Scenery } from "./scenery.ts";
 import { Arena } from "./arena.ts";
 import { Fx } from "./fx.ts";
 import { spriteKey, type SpriteSet } from "./sprites.ts";
 
-// El mundo mide siempre 480×320 "píxeles de juego" y se amplía hasta llenar el hueco disponible.
-const W = 480;
-const H = 320;
+// El mundo mide siempre 480×320 "píxeles de juego" (W×H, en scenery.ts) y se amplía hasta llenar el hueco disponible.
 const AREA: Rect = { x: 34, y: 56, w: 412, h: 244 }; // por donde pasean (dentro del claro, lejos de los árboles)
-const POND: Ellipse = { x: 118, y: 104, rx: 50, ry: 26 }; // estanque: el sitio favorito de los de tipo agua
-const TALL_GRASS: Ellipse = { x: 352, y: 262, rx: 58, ry: 24 }; // hierba alta: el de los de tipo planta
 const SLIDE_SECONDS = 0.35;
 
 // Luz del día: a cada hora clave le corresponde un color de luz y cuánta "noche" hay (0 a 1).
@@ -75,108 +72,20 @@ export interface Ranch {
   stopBattle(): void;
   /** Pone la corona al rey de una caja (o la quita con null). */
   setKing(boxIndex: number, pokemon: Pokemon | null): void;
+  /** Cambia el escenario de una caja (prado, playa, bosque nevado). */
+  setScene(boxIndex: number, scene: SceneId): void;
   /** Muestra una caja. direction: 1 entra por la derecha, -1 por la izquierda, 0 sin transición. */
   show(index: number, direction: number): void;
-}
-
-/** Altura del camino de tierra en cada x: una onda suave que cruza el prado. */
-const pathY = (x: number) => 182 + Math.sin(x / 75) * 26;
-
-/** El decorado se dibuja una sola vez por código: hierba, camino, flores y árboles. */
-function drawScenery(): Graphics {
-  const g = new Graphics();
-  // Hierba, más grande que el mundo para que no se vean bordes en pantallas anchas o altas.
-  g.rect(-W, -H, W * 3, H * 3).fill(0x5fa84a);
-  g.roundRect(18, 34, W - 36, H - 40, 26).fill({ color: 0x8fd16a, alpha: 0.3 }); // el claro
-  for (let i = 0; i < 1400; i++) {
-    const x = Math.floor(rand(-W, W * 2));
-    const y = Math.floor(rand(-H, H * 2));
-    g.rect(x, y, 2, 1).rect(x + 1, y - 1, 1, 1).fill(i % 3 ? 0x4f9440 : 0x77bd5c);
-  }
-
-  // Camino: muchos círculos solapados a lo largo de la onda; primero el borde, luego la tierra.
-  for (let x = -W; x <= W * 2; x += 5) g.circle(x, pathY(x), 13);
-  g.fill(0xb9945a);
-  for (let x = -W; x <= W * 2; x += 5) g.circle(x, pathY(x), 11);
-  g.fill(0xd9b77a);
-  for (let i = 0; i < 90; i++) {
-    const x = Math.floor(rand(-W, W * 2));
-    g.rect(x, Math.floor(pathY(x) + rand(-8, 8)), 2, 1);
-  }
-  g.fill(0xc4a066);
-
-  // Flores en grupitos, fuera del camino.
-  const petals = [0xffffff, 0xffe066, 0xff9ec4];
-  for (let i = 0; i < 22; i++) {
-    const cx = rand(30, W - 30);
-    const cy = rand(52, H - 12);
-    if (Math.abs(cy - pathY(cx)) < 22 || insideEllipse(POND, cx, cy)) continue;
-    const color = petals[i % petals.length];
-    for (let j = 0; j < 4; j++) {
-      const x = Math.floor(cx + rand(-9, 9));
-      const y = Math.floor(cy + rand(-6, 6));
-      g.rect(x - 1, y, 3, 1).rect(x, y - 1, 1, 3).fill(color);
-      g.rect(x, y, 1, 1).fill(0xe07b2a);
-    }
-  }
-
-  // Estanque: orilla de tierra, agua, reflejos y un par de nenúfares.
-  g.ellipse(POND.x, POND.y + 2, POND.rx + 4, POND.ry + 4).fill(0xb9945a);
-  g.ellipse(POND.x, POND.y, POND.rx, POND.ry).fill(0x4f9fdc);
-  g.ellipse(POND.x - 6, POND.y - 4, POND.rx * 0.7, POND.ry * 0.6).fill(0x6db7ec);
-  g.rect(POND.x - 20, POND.y - 8, 10, 1).rect(POND.x + 8, POND.y + 6, 12, 1).rect(POND.x - 4, POND.y + 12, 8, 1).fill(0xc9e8fb);
-  g.ellipse(POND.x + 28, POND.y - 10, 5, 3).ellipse(POND.x - 30, POND.y + 9, 4, 2.5).fill(0x3f8a47);
-
-  // Hierba alta: una mancha más oscura llena de briznas.
-  g.ellipse(TALL_GRASS.x, TALL_GRASS.y, TALL_GRASS.rx, TALL_GRASS.ry).fill(0x4a8f3c);
-  for (const color of [0x3d7a33, 0x6dbb63]) {
-    for (let i = 0; i < 90; i++) {
-      const p = pointInEllipse(TALL_GRASS);
-      g.rect(Math.floor(p.x), Math.floor(p.y) - 3, 1, 4).rect(Math.floor(p.x) + 2, Math.floor(p.y) - 2, 1, 3);
-    }
-    g.fill(color);
-  }
-
-  // Árboles en los bordes superior y laterales; los de más abajo se pintan después (por delante).
-  const trees: [number, number][] = [];
-  for (let x = -W; x <= W * 2; x += 21) {
-    trees.push([x + rand(-3, 3), rand(-12, -6)], [x + 10 + rand(-3, 3), 14 + rand(-3, 3)]);
-  }
-  for (let y = 40; y < H + 20; y += 23) {
-    for (const x of [8, W - 8]) {
-      if (Math.abs(y - pathY(x)) > 26) trees.push([x + rand(-3, 3), y + rand(-3, 3)]); // hueco para el camino
-    }
-  }
-  trees.sort((a, b) => a[1] - b[1]);
-  for (const [x, y] of trees) {
-    g.ellipse(x, y + 11, 9, 3).fill({ color: 0x000000, alpha: 0.2 });
-    g.rect(x - 2, y + 3, 4, 8).fill(0x6b4423);
-    g.circle(x, y - 4, 10).circle(x - 7, y + 1, 7).circle(x + 7, y + 1, 7).fill(0x2f6b3a);
-    g.circle(x - 2, y - 7, 6).circle(x + 5, y - 2, 4).fill(0x3f8a47);
-    g.rect(x - 4, y - 9, 2, 1).rect(x - 1, y - 11, 2, 1).fill(0x6dbb63);
-  }
-  return g;
-}
-
-/** Briznas que se pintan por delante de los Pokémon, para que parezca que están metidos en la hierba. */
-function drawTallGrassFront(): Graphics {
-  const g = new Graphics();
-  for (let i = 0; i < 70; i++) {
-    const p = pointInEllipse(TALL_GRASS);
-    g.rect(Math.floor(p.x), Math.floor(p.y) + 2, 1, 5).rect(Math.floor(p.x) + 1, Math.floor(p.y) + 4, 1, 3);
-  }
-  g.fill(0x4a8f3c);
-  return g;
 }
 
 export function createRanch(
   app: Application,
   pages: Page[],
   sprites: Map<string, SpriteSet | null>,
+  scenes: SceneId[],
   hooks: RanchHooks,
 ): Ranch {
   const world = new Container();
-  world.addChild(drawScenery());
   app.stage.addChild(world);
 
   // Día y noche: se tiñe todo el mundo con el color de la luz y se avisa a los Pokémon.
@@ -199,28 +108,48 @@ export function createRanch(
     }
   };
 
-  // Una capa por caja. Todas existen desde el principio, pero solo la visible se dibuja y se anima.
-  const herds = pages.map((page) => {
+  /** Sitio favorito y sitio a evitar de un Pokémon en un escenario, según sus tipos. */
+  const placesFor = (p: Pokemon, scenery: Scenery) => {
+    const types = SPECIES[p.species]?.types ?? [];
+    const home = scenery.homes.find((h) => h.types.some((t) => types.includes(t)))?.place ?? null;
+    return { home, avoid: home === scenery.avoid ? null : scenery.avoid };
+  };
+
+  // Una capa por caja, con su propio decorado: fondo, Pokémon (ordenados por y) y detalles por delante.
+  // Todas existen desde el principio, pero solo la visible se dibuja y se anima.
+  const herds = pages.map((page, i) => {
     const layer = new Container();
-    layer.sortableChildren = true; // ordena por zIndex para dar sensación de profundidad
     layer.visible = false;
+    const mons = new Container();
+    mons.sortableChildren = true; // ordena por zIndex para dar sensación de profundidad
+    let scenery = buildScenery(scenes[i] ?? "prado");
+    layer.addChild(scenery.back, mons, scenery.front);
     const critters = page.pokemon.map((p) => {
-      const types = SPECIES[p.species]?.types ?? [];
-      const water = types.includes("water");
-      const home = water ? POND : types.includes("grass") ? TALL_GRASS : null;
-      return new Critter(p, sprites.get(spriteKey(p)) ?? null, AREA, home, water ? null : POND, env);
+      const { home, avoid } = placesFor(p, scenery);
+      return new Critter(p, sprites.get(spriteKey(p)) ?? null, AREA, home, avoid, env);
     });
     critters.forEach((c) => {
-      layer.addChild(c.view);
+      mons.addChild(c.view);
       c.view.on("pointertap", () => {
         if (!dragged) select(c); // soltar tras arrastrar el rancho no cuenta como clic
       });
     });
     world.addChild(layer);
-    return { layer, critters };
+    const setScene = (id: SceneId) => {
+      const next = buildScenery(id);
+      layer.removeChild(scenery.back, scenery.front);
+      scenery.back.destroy();
+      scenery.front.destroy();
+      scenery = next;
+      layer.addChildAt(next.back, 0);
+      layer.addChild(next.front);
+      for (const c of critters) {
+        const places = placesFor(c.pokemon, next);
+        c.setPlaces(places.home, places.avoid);
+      }
+    };
+    return { layer, mons, critters, setScene };
   });
-
-  world.addChild(drawTallGrassFront());
 
   // Combates: los efectos van por encima de todo; la arena dirige a los que pelean.
   const fx = new Fx();
@@ -388,7 +317,7 @@ export function createRanch(
         const local = herds[current].critters.find((c) => c.pokemon === pokemon);
         if (local) return local;
         const guest = new Critter(pokemon, sprites.get(spriteKey(pokemon)) ?? null, AREA, null, null, env);
-        herds[current].layer.addChild(guest.view);
+        herds[current].mons.addChild(guest.view);
         guests.push(guest);
         return guest;
       });
@@ -397,6 +326,7 @@ export function createRanch(
     stopBattle: () => {
       if (arena.active) arena.stop();
     },
+    setScene: (boxIndex, scene) => herds[boxIndex]?.setScene(scene),
     setKing: (boxIndex, pokemon) => {
       for (const critter of herds[boxIndex]?.critters ?? []) critter.setCrown(critter.pokemon === pokemon);
     },

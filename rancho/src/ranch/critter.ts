@@ -57,6 +57,12 @@ export class Critter {
   private avoid: Ellipse | null; // sitio al que no va por gusto (el agua, si no es de agua)
   private env: Environment;
 
+  /** Cambia su sitio favorito y el que evita (al cambiar el escenario de la caja). */
+  setPlaces(home: Ellipse | null, avoid: Ellipse | null): void {
+    this.home = home;
+    this.avoid = avoid;
+  }
+
   constructor(pokemon: Pokemon, set: SpriteSet | null, zone: Rect, home: Ellipse | null, avoid: Ellipse | null, env: Environment) {
     this.pokemon = pokemon;
     this.set = set;

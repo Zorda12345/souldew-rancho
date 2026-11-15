@@ -3,6 +3,7 @@ import mock from "../../data/mock-save.json";
 import { SaveSchema } from "../data/schema.ts";
 import { createCard } from "../card/card.ts";
 import { createRanch } from "./ranch.ts";
+import { SCENES, isSceneId, type SceneId } from "./scenery.ts";
 import { loadSprites, spriteKey } from "./sprites.ts";
 import { createAnalyzer } from "../ui/analyzer.ts";
 import { createBattleUI } from "../ui/battle.ts";
@@ -78,7 +79,17 @@ export async function startRanch(root: HTMLElement): Promise<RanchApp> {
     // Sin almacenamiento o dato estropeado: nadie es rey todavía.
   }
 
-  const ranch = createRanch(app, save.boxes, sprites, {
+  // Escenario de cada caja (prado por defecto), recordado entre visitas.
+  const SCENES_KEY = "rancho.escenarios";
+  let scenes: SceneId[] = save.boxes.map(() => "prado");
+  try {
+    const stored: unknown = JSON.parse(localStorage.getItem(SCENES_KEY) ?? "[]");
+    if (Array.isArray(stored)) scenes = scenes.map((s, i) => (isSceneId(stored[i]) ? stored[i] : s));
+  } catch {
+    // Sin almacenamiento o dato estropeado: todas en el prado.
+  }
+
+  const ranch = createRanch(app, save.boxes, sprites, scenes, {
     onSelect: (critter) => {
       if (battle.pick(critter.pokemon)) {
         ranch.clearSelection(); // el clic era para elegir combatiente, no para abrir la ficha
@@ -133,6 +144,20 @@ export async function startRanch(root: HTMLElement): Promise<RanchApp> {
     (index, direction) => {
       card.close();
       ranch.show(index, direction);
+    },
+    {
+      options: SCENES,
+      current: (index) => scenes[index],
+      change: (index, id) => {
+        if (!isSceneId(id) || scenes[index] === id) return;
+        scenes[index] = id;
+        ranch.setScene(index, id);
+        try {
+          localStorage.setItem(SCENES_KEY, JSON.stringify(scenes));
+        } catch {
+          // Sin almacenamiento: dura hasta recargar.
+        }
+      },
     },
   );
   fit();

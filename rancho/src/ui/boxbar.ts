@@ -9,12 +9,24 @@ export interface BoxInfo {
 
 const STORAGE_KEY = "rancho.caja";
 
+/** Selector de escenario de la caja visible: qué opciones hay, cuál tiene cada caja y qué hacer al cambiarlo. */
+export interface SceneChoice {
+  options: { id: string; name: string }[];
+  current(index: number): string;
+  change(index: number, id: string): void;
+}
+
 export interface BoxBar {
   /** Muestra en el letrero quién es el rey de una caja (null = nadie). */
   setKing(index: number, name: string | null): void;
 }
 
-export function createBoxBar(root: HTMLElement, boxes: BoxInfo[], onChange: (index: number, direction: number) => void): BoxBar {
+export function createBoxBar(
+  root: HTMLElement,
+  boxes: BoxInfo[],
+  onChange: (index: number, direction: number) => void,
+  scene: SceneChoice,
+): BoxBar {
   const button = (cls: string, text: string, label: string) => {
     const b = document.createElement("button");
     b.type = "button";
@@ -40,7 +52,33 @@ export function createBoxBar(root: HTMLElement, boxes: BoxInfo[], onChange: (ind
   const king = document.createElement("span");
   king.className = "king";
   info.append(select, meta, king, count);
-  root.append(prev, info, next);
+
+  // Escenario de la caja: tres botones bajo el letrero; el pulsado se marca con aria-pressed.
+  const scenes = document.createElement("div");
+  scenes.className = "scenes";
+  scenes.setAttribute("role", "group");
+  scenes.setAttribute("aria-label", "Escenario de la caja");
+  const sceneButtons = scene.options.map((o) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = o.name;
+    b.dataset.scene = o.id;
+    b.addEventListener("click", () => {
+      scene.change(index, o.id);
+      markScene();
+    });
+    return b;
+  });
+  scenes.append(...sceneButtons);
+  const markScene = () => {
+    const now = scene.current(index);
+    for (const b of sceneButtons) b.setAttribute("aria-pressed", String(b.dataset.scene === now));
+  };
+
+  const sign = document.createElement("div");
+  sign.className = "sign";
+  sign.append(info, scenes);
+  root.append(prev, sign, next);
 
   let index = -1;
   const kings: (string | null)[] = boxes.map(() => null);
@@ -58,6 +96,7 @@ export function createBoxBar(root: HTMLElement, boxes: BoxInfo[], onChange: (ind
     meta.textContent = box.label;
     count.textContent = `${box.count}/${box.capacity}`;
     showKing();
+    markScene();
     try {
       localStorage.setItem(STORAGE_KEY, String(index)); // recordar para la próxima visita
     } catch {
