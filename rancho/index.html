@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rancho Pokémon</title>
+  </head>
+  <body>
+    <div id="ranch-root" hidden>
+      <div id="app"></div>
+      <nav id="boxbar" class="boxbar" aria-label="Cajas"></nav>
+      <section id="team-wrap" class="team-wrap" aria-label="Equipo">
+        <div id="team" class="team"></div>
+        <button id="analyze" class="analyze" type="button">Analizar equipo</button>
+        <button id="team-toggle" class="team-toggle" type="button"></button>
+      </section>
+      <div id="battle" class="battle"></div>
+      <div id="zoom" class="zoom" role="group" aria-label="Zoom del rancho">
+        <button type="button" data-zoom="out" aria-label="Alejar">−</button>
+        <button type="button" data-zoom="reset" aria-label="Ver todo el rancho">⌂</button>
+        <button type="button" data-zoom="in" aria-label="Acercar">+</button>
+      </div>
+      <dialog id="analysis" class="analysis" aria-label="Análisis del equipo"></dialog>
+      <aside id="card" class="card" aria-label="Ficha del Pokémon"></aside>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1478,3 +1478,9 @@ html.pad-nav .cart:focus .cart-body { transform: translateY(-4px) rotate(-0.6deg
 html.pad-nav .cart:focus .cart-slot { filter: drop-shadow(0 0 2px var(--focus)) drop-shadow(0 0 12px color-mix(in srgb, var(--focus) 70%, transparent)) drop-shadow(0 8px 12px #0008); }
 html.pad-nav .cart:focus .cart-title { color: var(--focus); }
 @media (prefers-reduced-motion: reduce) { html.pad-nav :focus { transition: none; } }
+
+/* ---------- Ranch (web/views/rancho.mjs): the ranch app in an iframe, filling the rest of the window ---------- */
+.rancho-view { display: flex; flex-direction: column; height: calc(100vh - 64px); min-height: 420px; }
+.rancho-view .topbar { margin-bottom: 12px; }
+.rancho-view .topbar p { margin: 0; flex-basis: 100%; }
+.rancho-frame { flex: 1; width: 100%; min-height: 360px; border: 1px solid var(--edge); border-radius: var(--r-l); background: #5fa84a; }

@@ -1,0 +1,56 @@
+/* Tokens de diseño: la única fuente de colores, tipografías y medidas. Ver docs/design-system.md */
+:root {
+  /* Materiales */
+  --pergamino: #f5e3b3;
+  --pergamino-claro: #fcf3d9;
+  --pergamino-sombra: #e2c98c;
+  --tinta: #3b2416;
+  --tinta-suave: #7a5a3e;
+  --madera: #a06a35;
+  --madera-oscura: #5c3a17;
+  --madera-clara: #c98f52;
+
+  /* Acentos */
+  --laguna: #1f7a80; /* interacción y selección */
+  --laguna-oscura: #145a5f;
+  --oro: #f2b632; /* destacado, shiny, PP */
+  --sube: #c8402f; /* estadística que sube con la naturaleza */
+  --baja: #2f6fb5; /* estadística que baja */
+
+  /* Escala de valor de una estadística, de floja a excelente */
+  --valor-1: #d9503a;
+  --valor-2: #e8913a;
+  --valor-3: #e8c53a;
+  --valor-4: #7fbf4a;
+  --valor-5: #2fa58c;
+
+  /* Tipografía */
+  --fuente-pixel: "Pixelify Sans Variable", "Rubik Variable", system-ui, sans-serif;
+  --fuente-texto: "Rubik Variable", system-ui, "Segoe UI", sans-serif;
+
+  /* Espaciado: múltiplos de 4 px */
+  --e1: 4px;
+  --e2: 8px;
+  --e3: 12px;
+  --e4: 16px;
+  --e6: 24px;
+
+  /* Marcos */
+  --radio-marco: 14px;
+  --radio-interior: 8px;
+  --borde-marco: 3px solid var(--madera-oscura);
+  --sombra-marco: 0 4px 0 rgb(59 36 22 / 0.45); /* sombra dura, sin difuminar: el toque pixel */
+
+  /* Soul Link: tema oscuro tipo app de escritorio (inspirado en souldew) */
+  --sl-fondo: #121219;
+  --sl-lateral: #17171f;
+  --sl-panel: #1d1d27;
+  --sl-elevado: #252531;
+  --sl-borde: #33333f;
+  --sl-texto: #ecebf3;
+  --sl-suave: #9d9aae;
+  --sl-acento: #a99cff; /* selección, foco, enlaces */
+  --sl-vivo: #8fd47a;
+  --sl-caido: #f07f72;
+  --sl-espera: #e8c661;
+}

@@ -19,6 +19,8 @@ this repository are linked; the others are available at the linked projects.
 | Pixelify Sans (font) | – | SIL OFL 1.1 ([text](web/assets/fonts/OFL-PixelifySans.txt)) | `web/assets/fonts/PixelifySans-*` | https://github.com/eifetx/Pixelify-Sans |
 | IBM Plex Sans / Plex Mono (fonts) | – | SIL OFL 1.1 ([text](web/assets/fonts/OFL-IBMPlex.txt)) | `web/assets/fonts/IBMPlex*` | https://github.com/IBM/plex |
 | libretro API headers (`libretro.h`, `libretro_vulkan.h`) | from libretro-common | MIT (in the files) | `native/ctr-host/` | https://github.com/libretro/libretro-common |
+| Ranch sprites (Pokémon Mystery Dungeon style) | – | CC BY-NC 4.0 (non-commercial, with attribution; authors per species in [rancho/CREDITS.md](rancho/CREDITS.md)) | `web/rancho/sprites/` | https://github.com/PMDCollab/SpriteCollab |
+| Ranch build: PixiJS, Zod, Rubik and Pixelify Sans (via Fontsource) | see `package.json` | MIT (PixiJS, Zod); SIL OFL 1.1 (fonts) | `web/rancho/assets/` (built by `npm run rancho:build` from `rancho/`) | https://github.com/pixijs/pixijs, https://github.com/colinhacks/zod, https://fontsource.org |
 
 `web/assets/fonts/PixelDigits-*.ttf` is made by this project (`scripts/build-pixel-digits.mjs`) and is under the
 project license.

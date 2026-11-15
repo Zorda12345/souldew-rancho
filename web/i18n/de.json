@@ -2524,5 +2524,9 @@
   "rnd.totemPokemonMod.UNCHANGED": "Unverändert",
   "rnd.totemPokemonMod.help": "Die Bosse am Ende der Inselprüfungen.",
   "rnd.typesFollowMegaEvolutions": "Mega-Entwicklungen behalten die Typen",
-  "new.progFinish": "Stelle die neue Spieldatei für {name} fertig …"
+  "new.progFinish": "Stelle die neue Spieldatei für {name} fertig …",
+  "nav.rancho": "Ranch",
+  "rancho.title": "Ranch",
+  "rancho.intro": "Deine Pokémon spazieren über die Wiese. Klick auf eins, um seinen Steckbrief zu sehen. Vorerst mit Beispieldaten.",
+  "rancho.frame": "Pokémon-Ranch"
 }

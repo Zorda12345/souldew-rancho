@@ -2524,5 +2524,9 @@
   "rnd.totemPokemonMod.UNCHANGED": "Invariato",
   "rnd.totemPokemonMod.help": "I boss alla fine delle prove delle isole.",
   "rnd.typesFollowMegaEvolutions": "Le megaevoluzioni mantengono i tipi",
-  "new.progFinish": "Completamento del nuovo file di gioco per {name} …"
+  "new.progFinish": "Completamento del nuovo file di gioco per {name} …",
+  "nav.rancho": "Ranch",
+  "rancho.title": "Ranch",
+  "rancho.intro": "I tuoi Pokémon a spasso per il prato. Clicca su uno per vedere la sua scheda. Per ora con dati di esempio.",
+  "rancho.frame": "Ranch Pokémon"
 }
