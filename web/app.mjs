@@ -24,6 +24,7 @@ import { LinkView } from './views/link.mjs';
 import { SettingsView, gpuFallbackText } from './views/settings.mjs';
 import { GuideView } from './views/guide.mjs';
 import { RanchView } from './views/rancho.mjs';
+import { RetroView } from './views/retro.mjs';
 import { StreamView } from './views/stream.mjs';
 import { useStreamer } from './lib/streamer.mjs';
 import { UpdateBanner } from './views/update.mjs';
@@ -633,7 +634,7 @@ function App() {
     return html`<div class="boot"><div class="boot-screen"></div></div>`;
   }
   const showOnboarding = !!status && !status.config?.onboarded;
-  const View = { library: LibraryView, soullink: SoulLinkView, nuzlocke: NuzlockeView, play: PlayView, link: LinkView, stream: StreamView, trophies: TrophiesView, settings: SettingsView, guide: GuideView, rancho: RanchView }[route.route] || LibraryView;
+  const View = { library: LibraryView, soullink: SoulLinkView, nuzlocke: NuzlockeView, play: PlayView, link: LinkView, stream: StreamView, trophies: TrophiesView, settings: SettingsView, guide: GuideView, rancho: RanchView, retro: RetroView }[route.route] || LibraryView;
   const names = runDoc ? getPlayers(runDoc, manifest) : null;
   // Fullscreen – the window's (macOS: green button, Windows: F11) or the game's (F): the side rail folds away, the game gets the room
   const [winFs, setWinFs] = useState(false);
@@ -699,6 +700,7 @@ function App() {
     { id: 'link', label: t('nav.link', 'Connection'), icon: 'signal', accent: '#6f9bff' },
     { id: 'stream', label: t('nav.stream', 'Stream'), icon: 'stream', accent: '#ff5b6e', onAir: streamer },
     { id: 'trophies', label: t('nav.trophies', 'Trophies'), icon: 'trophy', accent: '#e7c24f' },
+    { id: 'retro', label: t('nav.retro', 'Retro achievements'), icon: 'retro', accent: '#5fb7e6' },
     { id: 'settings', label: t('nav.settings', 'Settings'), icon: 'gear', accent: '#9a8ee6' },
     { id: 'guide', label: t('nav.guide', 'Help'), icon: 'help', accent: '#4fb8c4' },
   ];

@@ -1484,3 +1484,50 @@ html.pad-nav .cart:focus .cart-title { color: var(--focus); }
 .rancho-view .topbar { margin-bottom: 12px; }
 .rancho-view .topbar p { margin: 0; flex-basis: 100%; }
 .rancho-frame { flex: 1; width: 100%; min-height: 360px; border: 1px solid var(--edge); border-radius: var(--r-l); background: #5fa84a; }
+
+/* ---------- RetroAchievements (web/views/retro.mjs): cuenta, juego actual con su pared de insignias, esta semana ---------- */
+.retro-view .topbar p { margin: 0; flex-basis: 100%; }
+.ra-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.ra-grid > .ra-account { grid-column: 1 / -1; }
+.ra-connect { max-width: 560px; display: flex; flex-direction: column; gap: 14px; }
+.ra-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.ra-steps .btn { margin-left: 6px; vertical-align: middle; }
+.ra-field { display: flex; flex-direction: column; gap: 5px; font-size: 13px; color: var(--ink-2); }
+.ra-field input { width: 100%; max-width: 360px; font: inherit; font-size: 15px; color: var(--ink); background: var(--shell); border: 1px solid var(--edge); border-radius: var(--r-m); padding: 8px 10px; }
+.ra-field input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.ra-error { margin: 0; color: var(--bad-ink); }
+.ra-account { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ra-avatar { width: 64px; height: 64px; border-radius: var(--r-m); background: var(--shell-3); image-rendering: auto; flex: none; }
+.ra-who { flex: 1; min-width: 180px; }
+.ra-who h2 { overflow-wrap: anywhere; }
+.ra-presence { margin: 4px 0 0; color: var(--ok-ink); font-size: 14px; }
+.ra-points { display: flex; gap: 18px; margin: 0; }
+.ra-points div { display: flex; flex-direction: column-reverse; align-items: flex-end; }
+.ra-points dt { font-size: 12px; color: var(--ink-3); }
+.ra-points dd { margin: 0; font-family: var(--font-pixel); font-size: 26px; color: var(--warn-ink); }
+.ra-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+.ra-game-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ra-game-head img { border-radius: var(--r-s); flex: none; }
+.ra-game-head > div { flex: 1; min-width: 0; }
+.ra-game-head p { margin: 2px 0 0; }
+.ra-tag { margin-left: 6px; padding: 1px 7px; border-radius: 10px; background: color-mix(in srgb, var(--tri) 22%, transparent); color: var(--ok-ink); font-size: 12px; }
+.ra-count { margin: 0; font-family: var(--font-pixel); font-size: 15px; color: var(--ink-3); }
+.ra-count b { font-size: 30px; font-weight: 500; color: var(--ink); }
+/* la barra como una pantalla LCD de portátil */
+.ra-bar { height: 12px; border-radius: 3px; background: var(--lcd-1); border: 1px solid var(--lcd-0); box-shadow: inset 0 1px 2px #0008; overflow: hidden; margin-bottom: 6px; }
+.ra-bar i { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--lcd-4) 0 6px, var(--lcd-3) 6px 8px); transition: width .4s ease; }
+/* la pared de insignias: las conseguidas a color, las que faltan apagadas sobre el verde de la pantalla */
+.ra-wall { list-style: none; margin: 14px 0 0; padding: 10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 6px;
+  background: var(--lcd-0); border-radius: var(--r-m); box-shadow: inset 0 1px 3px #000a; }
+.ra-wall li { aspect-ratio: 1; border-radius: 4px; overflow: hidden; background: var(--lcd-1); }
+.ra-wall img { width: 100%; height: 100%; display: block; }
+.ra-wall li.locked img { filter: grayscale(1) brightness(.45) sepia(.6) hue-rotate(50deg); opacity: .7; }
+.ra-wall li.got { box-shadow: 0 0 0 1px var(--warn), 0 0 8px color-mix(in srgb, var(--warn) 35%, transparent); }
+.ra-recent h2 { margin-bottom: 10px; }
+.ra-recent ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.ra-recent li { display: flex; gap: 10px; align-items: flex-start; }
+.ra-recent li img { border-radius: 4px; flex: none; }
+.ra-ach { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ra-pts { font-family: var(--font-pixel); color: var(--warn-ink); font-size: 16px; }
+@media (max-width: 900px) { .ra-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .ra-bar i { transition: none; } }

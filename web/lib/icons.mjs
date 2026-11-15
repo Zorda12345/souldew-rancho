@@ -435,6 +435,8 @@ const NAV_ICONS = {
   // a cup – it bobs on hover
   trophy: html`<g class="ni-bob"><path d="M7.5 4.5h9v4.4a4.5 4.5 0 0 1-9 0z" /><path d="M7.5 6.4H5a2.5 2.5 0 0 0 2.8 3.5M16.5 6.4H19a2.5 2.5 0 0 1-2.8 3.5" /><path d="M12 13.4v3.1M8.8 20.2h6.4l-.7-3.7H9.5z" /></g>`,
   ranch: html`<path d="M4 11.5 12 5l8 6.5" /><path d="M6 10v9.5h12V10" /><path class="ni-bob" d="M10 19.5v-4.5h4v4.5" /><path d="M2.5 19.5h19" />`,
+  // un mando con una estrella encima (RetroAchievements): la estrella da un saltito al pasar el ratón
+  retro: html`<rect x="3" y="11" width="18" height="9" rx="4.5" /><path d="M7 15.5h3M8.5 14v3" /><circle cx="15.5" cy="14.6" r=".7" /><circle cx="17.4" cy="16.6" r=".7" /><path class="ni-bob" d="M12 2.8l1.1 2.3 2.5.3-1.8 1.7.5 2.5-2.3-1.2-2.3 1.2.5-2.5-1.8-1.7 2.5-.3z" />`,
   help: html`<circle cx="12" cy="12" r="9" /><path class="ni-bob" d="M9.4 9.3a2.7 2.7 0 0 1 5.2 1c0 1.9-2.6 2.3-2.6 4" /><circle class="ni-bob" cx="12" cy="17.3" r=".7" />`,
 };
 

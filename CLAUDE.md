@@ -42,4 +42,8 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
   imágenes con caché en `/retroach/(UserPic|Badge|Images)/x.png`. `SOULDEW_RA_URL` = API falsa de los tests
   (`test/retroach.test.mjs`). La web de RetroAchievements tiene Cloudflare; la API y `media.` no.
   Juegos principales de DS con logros: Diamante, Platino, HG/SS, Negro, Blanco, Negro 2 (y Blanco 2).
-  Siguen: 2) pestaña «Logros» (cuenta, recientes, progreso; ajustes para pegar usuario y clave) y 3) avisos en directo + i18n.
+  2) vista HECHA: `web/views/retro.mjs` (`RetroView`, ruta `#/retro`, menú «Logros retro» `nav.retro` tras Trofeos, icono
+  `retro` en NAV_ICONS, estilos `.ra-*` al final de `web/styles.css`): formulario para conectar (usuario + clave, pasos
+  para sacarla), cuenta (avatar, Rich Presence, puntos, Perfil/Actualizar/Desconectar), juego actual (barra LCD y pared de
+  insignias: conseguidas a color, el resto apagadas) y «Esta semana»; se refresca cada 60 s con la pestaña visible.
+  Textos `retro.*` en los 5 idiomas. Sigue: 3) avisos en directo de logros nuevos en cualquier pantalla.
