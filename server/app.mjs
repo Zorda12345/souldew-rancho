@@ -38,6 +38,7 @@ import { randomBytes } from 'node:crypto';
 import { syncTrophies } from './lib/trophies.mjs';
 import * as liveRuns from './lib/liveruns.mjs';
 import * as retroach from './lib/retroach.mjs';
+import { pmdUrl } from './lib/pmd.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -1676,6 +1677,9 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
       // avatar, insignias e iconos de RetroAchievements (públicos), con caché en disco
       const raMedia = retroach.mediaUrl(path);
       if (raMedia) return serveCached(res, join(CACHE_DIR, 'retroach', raMedia.file), raMedia.url);
+      // fork: sprites de Mundo Misterioso para el rancho (los que no vienen en web/rancho/sprites)
+      const pmd = pmdUrl(path);
+      if (pmd) return serveCached(res, join(CACHE_DIR, 'pmd', pmd.file), pmd.url);
       const cover = path.match(/^\/covers\/([a-z0-9-]+)\.png$/);
       if (cover) {
         const bundled = join(WEB_DIR, 'assets', 'covers', `${cover[1]}.png`);

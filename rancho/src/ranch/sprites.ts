@@ -65,10 +65,13 @@ export function idleCanvas(set: SpriteSet): { canvas: HTMLCanvasElement; draw(fr
 }
 
 const BASE = `${import.meta.env.BASE_URL}sprites/`;
+// Los que no vienen descargados: el servidor de souldew los baja de SpriteCollab y los guarda (server/lib/pmd.mjs).
+const REMOTE = `${import.meta.env.BASE_URL}pmd/`;
 
-async function loadSet(key: string): Promise<SpriteSet> {
-  const dir = `${BASE}${key}/`;
-  const xml = new DOMParser().parseFromString(await (await fetch(`${dir}AnimData.xml`)).text(), "application/xml");
+async function loadSet(dir: string): Promise<SpriteSet> {
+  const res = await fetch(`${dir}AnimData.xml`);
+  if (!res.ok) throw new Error(`sin AnimData.xml (${res.status})`);
+  const xml = new DOMParser().parseFromString(await res.text(), "application/xml");
   const nodes = [...xml.querySelectorAll("Anim")];
   const find = (name: string) => nodes.find((n) => n.querySelector("Name")?.textContent === name);
 
@@ -129,7 +132,8 @@ async function loadStatic(url: string): Promise<SpriteSet> {
 
 /**
  * Devuelve un SpriteSet por clave ("6", "130/shiny"…) o null si no está disponible: nunca lanza.
- * Si no hay sprite de Mundo Misterioso descargado y se da `fallback`, prueba con esa imagen fija.
+ * Orden: sprite de Mundo Misterioso descargado -> el mismo pedido al servidor (cualquier especie) -> imagen fija de
+ * `fallback` (solo si SpriteCollab no tiene esa especie o no hay conexión).
  */
 export async function loadSprites(keys: string[], fallback?: (key: string) => string | null): Promise<Map<string, SpriteSet | null>> {
   let available: string[] = [];
@@ -141,7 +145,12 @@ export async function loadSprites(keys: string[], fallback?: (key: string) => st
   const entries = await Promise.all(
     [...new Set(keys)].map(async (key): Promise<[string, SpriteSet | null]> => {
       try {
-        if (available.includes(key)) return [key, await loadSet(key)];
+        if (available.includes(key)) return [key, await loadSet(`${BASE}${key}/`)];
+        try {
+          return [key, await loadSet(`${REMOTE}${key}/`)];
+        } catch (e) {
+          console.warn(`Sin sprite de Mundo Misterioso para ${key}:`, e);
+        }
         const url = fallback?.(key);
         return [key, url ? await loadStatic(url) : null];
       } catch (e) {
