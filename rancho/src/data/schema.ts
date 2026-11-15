@@ -1,5 +1,5 @@
-// CONTRATO DE DATOS de pokemon.json.
-// Hoy lo cumple data/mock-save.json; en el futuro lo generará el lector de .sav de 3ª gen.
+// CONTRATO DE DATOS del rancho.
+// Lo cumplen data/mock-save.json (datos de prueba) y lo que se construye desde una run de souldew (data/souldew.ts).
 import { z } from "zod";
 import { NATURES } from "./stats.ts";
 
@@ -17,7 +17,7 @@ export const MoveSchema = z
   .refine((m) => m.pp <= m.ppMax, { message: "pp no puede superar ppMax" });
 
 export const PokemonSchema = z.object({
-  species: z.number().int().min(1).max(386), // número de la Pokédex nacional
+  species: z.number().int().min(1).max(649), // número de la Pokédex nacional (hasta la 5ª gen)
   nickname: z.string().min(1).max(10),
   level: z.number().int().min(1).max(100),
   nature: z.enum(NATURES),
@@ -31,9 +31,14 @@ export const PokemonSchema = z.object({
     (e) => Object.values(e).reduce((a, b) => a + b, 0) <= 510,
     { message: "los EVs no pueden sumar más de 510" },
   ),
-  moves: z.array(MoveSchema).min(1).max(4),
+  moves: z.array(MoveSchema).max(4), // vacío si no se conocen (datos estimados)
   friendship: byte,
   status: z.enum(["none", "sleep", "poison", "badPoison", "burn", "freeze", "paralysis"]),
+  /**
+   * true = viene de souldew, que no da naturaleza, IVs, EVs, habilidad, sexo, amistad ni movimientos: esos campos llevan
+   * valores neutros solo para poder calcular, y la interfaz NO los muestra (la ficha avisa de que son estimados).
+   */
+  estimated: z.boolean().optional(),
 });
 
 export const BoxSchema = z.object({
@@ -47,7 +52,7 @@ export const SaveSchema = z.object({
     name: z.string().min(1).max(7),
     id: z.number().int().min(0).max(65535),
   }),
-  party: z.array(PokemonSchema).min(1).max(6),
+  party: z.array(PokemonSchema).max(6),
   boxes: z.array(BoxSchema).max(14),
 });
 

@@ -25,7 +25,8 @@ export interface TeamAnalysis {
 }
 
 const typesOf = (p: Pokemon): TypeId[] => SPECIES[p.species]?.types ?? [];
-const attacksOf = (p: Pokemon): TypeId[] => attackTypes(p.moves.map((m) => m.name));
+// Con datos estimados (souldew) no hay movimientos: pelean con un ataque básico de cada uno de sus tipos.
+const attacksOf = (p: Pokemon): TypeId[] => (p.estimated ? typesOf(p) : attackTypes(p.moves.map((m) => m.name)));
 
 function list(types: TypeId[]): string {
   const names = types.map((t) => TYPES[t].name);

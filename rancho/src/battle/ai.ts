@@ -2,7 +2,7 @@
 // para poder probarlas. Cada decisión se basa en el daño ESPERADO con la fórmula real de 3ª gen.
 import { MOVES, type Move } from "../data/moves.ts";
 import type { StatKey } from "../data/stats.ts";
-import { effectivenessAgainst } from "../data/types.ts";
+import { TYPES, effectivenessAgainst, type TypeId } from "../data/types.ts";
 import { calcDamage, effectiveStat, isPhysical, type Fighter } from "./damage.ts";
 
 export interface Plan { name: string; move: Move }
@@ -29,8 +29,17 @@ export function expectedDamage(attacker: Fighter, defender: Fighter, move: Move,
   return base * ((move.accuracy ?? 100) / 100) * (1 + crit); // un crítico duplica: de media suma su probabilidad
 }
 
-/** Movimientos que conoce y que el rancho sabe usar. */
+/**
+ * Regla del rancho para los Pokémon traídos de souldew (no se saben sus movimientos): un ataque básico por cada uno
+ * de sus tipos, de potencia 60 y que no falla. Físico o especial según el tipo, como todo en 3ª gen.
+ */
+export function basicMoves(types: TypeId[]): Plan[] {
+  return types.map((type) => ({ name: `Ataque ${TYPES[type].name.toLowerCase()}`, move: { type, power: 60, accuracy: 100 } }));
+}
+
+/** Movimientos que conoce y que el rancho sabe usar (los básicos si sus datos son estimados). */
 export function knownMoves(fighter: Fighter): Plan[] {
+  if (fighter.pokemon.estimated) return basicMoves(fighter.types);
   return fighter.pokemon.moves.map((m) => ({ name: m.name, move: MOVES[m.name] })).filter((p): p is Plan => p.move !== undefined);
 }
 

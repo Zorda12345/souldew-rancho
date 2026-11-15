@@ -39,6 +39,8 @@ function currentHour(): number {
 
 /** Cuánto se buscan dos Pokémon: suma su amistad media (0 a 1) y un extra si sus naturalezas son afines. */
 function affinity(a: Pokemon, b: Pokemon): number {
+  // Datos de souldew: no hay amistad ni naturaleza reales. Se buscan por igual (y salen notas ♪, no corazones).
+  if (a.estimated || b.estimated) return 0.5;
   const friendship = (a.friendship + b.friendship) / 2 / 255;
   // Regla propia del rancho: son afines si sus naturalezas suben la misma estadística (o ambas son neutras).
   const compatible = natureEffect(a.nature).up === natureEffect(b.nature).up;

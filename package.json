@@ -33,7 +33,8 @@
     "rancho:dev": "vite --config rancho/vite.config.ts",
     "rancho:test": "vitest run --root rancho",
     "rancho:sprites": "node rancho/scripts/download-sprites.ts",
-    "rancho:mock": "node rancho/scripts/generate-mock.ts"
+    "rancho:mock": "node rancho/scripts/generate-mock.ts",
+    "rancho:species": "node rancho/scripts/build-species.ts"
   },
   "updates": {
     "repo": "souldewapp/souldew",

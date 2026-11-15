@@ -1,6 +1,5 @@
 import { Application } from "pixi.js";
-import mock from "../../data/mock-save.json";
-import { SaveSchema } from "../data/schema.ts";
+import type { Source } from "../data/source.ts";
 import { createCard } from "../card/card.ts";
 import { createRanch } from "./ranch.ts";
 import { SCENES, isSceneId, type SceneId } from "./scenery.ts";
@@ -17,9 +16,8 @@ export type RanchApp = { show(): void; hide(): void };
  * Arranca el rancho dentro de `root` (el contenedor con la barra, el equipo, la ficha...).
  * Se llama una sola vez: al salir del rancho se oculta y se pausa, en vez de destruirlo.
  */
-export async function startRanch(root: HTMLElement): Promise<RanchApp> {
-  // Los datos pasan siempre por el contrato antes de usarse.
-  const save = SaveSchema.parse(mock);
+export async function startRanch(root: HTMLElement, source: Source): Promise<RanchApp> {
+  const { save } = source; // ya validado contra el contrato (data/schema.ts)
 
   const app = new Application();
   await app.init({
@@ -38,7 +36,7 @@ export async function startRanch(root: HTMLElement): Promise<RanchApp> {
 
   // Los sprites se cargan una vez y los comparten el rancho, la franja del equipo y la ficha.
   const everyone = [...save.party, ...save.boxes.flatMap((box) => box.pokemon)];
-  const sprites = await loadSprites(everyone.map(spriteKey));
+  const sprites = await loadSprites(everyone.map(spriteKey), source.spriteFallback);
 
   // El rancho se encaja en el hueco que dejan la barra (arriba), el equipo (izquierda, si no está oculto)
   // y la ficha (derecha, solo en pantallas anchas).
@@ -71,7 +69,7 @@ export async function startRanch(root: HTMLElement): Promise<RanchApp> {
   };
 
   // Reyes de cada caja: se guarda la posición del Pokémon dentro de su caja.
-  const KINGS_KEY = "rancho.reyes";
+  const KINGS_KEY = `rancho.reyes.${source.id}`; // cada run (y los datos de prueba) guarda los suyos
   let kings: Record<string, number> = {};
   try {
     kings = JSON.parse(localStorage.getItem(KINGS_KEY) ?? "{}");
@@ -80,7 +78,7 @@ export async function startRanch(root: HTMLElement): Promise<RanchApp> {
   }
 
   // Escenario de cada caja (prado por defecto), recordado entre visitas.
-  const SCENES_KEY = "rancho.escenarios";
+  const SCENES_KEY = `rancho.escenarios.${source.id}`;
   let scenes: SceneId[] = save.boxes.map(() => "prado");
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(SCENES_KEY) ?? "[]");

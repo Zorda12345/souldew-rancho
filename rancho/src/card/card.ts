@@ -1,5 +1,6 @@
 // La ficha: un panel lateral de HTML normal que se rellena con los datos del Pokémon.
 import { moveType } from "../data/moves.ts";
+import { basicMoves } from "../battle/ai.ts";
 import type { Pokemon } from "../data/schema.ts";
 import { SPECIES } from "../data/species.ts";
 import { STAT_KEYS, natureEffect, type Nature, type StatKey } from "../data/stats.ts";
@@ -39,7 +40,51 @@ function rate(key: StatKey, value: number, level: number): { tier: number; fill:
   return { tier, fill: pct(perLevel / 3.6), label: ["Floja", "Justa", "Normal", "Buena", "Excelente"][tier - 1] };
 }
 
+/**
+ * Ficha de un Pokémon traído de souldew: solo lo que se sabe de verdad (nivel, estado, objeto, tipos) y las
+ * estadísticas calculadas desde la especie, avisando de que son estimadas. Nada de naturaleza, IVs, EVs ni movimientos.
+ */
+function renderEstimated(p: Pokemon): string {
+  const species = SPECIES[p.species];
+  const statRows = STAT_KEYS.map((k) => {
+    const r = rate(k, p.stats[k], p.level);
+    return `<tr>
+      <th scope="row">${STAT_ES[k]}</th>
+      <td class="num strong">${p.stats[k]}</td>
+      <td class="bar-cell"><div class="bar" title="${r.label}"><i class="tier-${r.tier}" style="width:${r.fill}"></i></div></td>
+    </tr>`;
+  }).join("");
+  const basics = basicMoves(species?.types ?? [])
+    .map((b) => `<li>${typeIcon(b.move.type)}<span class="move-name">${esc(b.name)}</span><span class="num muted">Potencia ${b.move.power}</span></li>`)
+    .join("");
+  return `
+    <button class="close" type="button" aria-label="Cerrar ficha">✕</button>
+    <header>
+      <div class="portrait"></div>
+      <div class="who">
+        <h2>${esc(p.nickname)}</h2>
+        <p class="muted">${esc(species?.name ?? `Especie ${p.species}`)}, N.º ${String(p.species).padStart(3, "0")}</p>
+        <p class="types">${(species?.types ?? []).map(typeChip).join("")}</p>
+      </div>
+    </header>
+    <p class="chips">
+      <span class="chip">Nivel ${p.level}</span>
+      ${p.shiny ? `<span class="chip shiny">★ Shiny</span>` : ""}
+      ${p.status !== "none" ? `<span class="chip status">${STATUS_ES[p.status]}</span>` : ""}
+    </p>
+    <dl>
+      <dt>Objeto</dt><dd>${p.item ? esc(p.item) : `<span class="muted">Ninguno</span>`}</dd>
+    </dl>
+    <h3>Estadísticas estimadas</h3>
+    <p class="muted">souldew no da naturaleza, IVs ni EVs: son las de su especie a este nivel, con valores medios.</p>
+    <table><tbody>${statRows}</tbody></table>
+    <h3>En las peleas</h3>
+    <p class="muted">Sin sus movimientos reales, pelea con un ataque básico de su tipo (regla del rancho).</p>
+    <ul class="moves">${basics}</ul>`;
+}
+
 function render(p: Pokemon): string {
+  if (p.estimated) return renderEstimated(p);
   const species = SPECIES[p.species];
   const { up, down } = natureEffect(p.nature);
   const [genderIcon, genderName] = GENDER[p.gender];

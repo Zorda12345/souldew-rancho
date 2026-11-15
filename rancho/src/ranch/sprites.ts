@@ -108,8 +108,30 @@ async function loadSet(key: string): Promise<SpriteSet> {
   };
 }
 
-/** Devuelve un SpriteSet por clave ("6", "130/shiny"…) o null si no está disponible: nunca lanza. */
-export async function loadSprites(keys: string[]): Promise<Map<string, SpriteSet | null>> {
+/**
+ * Sprite fijo (sin animación) a partir de una imagen suelta, p. ej. el sprite de juego que sirve souldew.
+ * Se reduce a la mitad para que tenga el tamaño de los de Mundo Misterioso y se usa en todas las animaciones.
+ */
+async function loadStatic(url: string): Promise<SpriteSet> {
+  const image = await Assets.load<Texture>(url);
+  const img = image.source.resource as CanvasImageSource & { width: number; height: number };
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(img.width / 2);
+  canvas.height = Math.ceil(img.height / 2);
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = false; // píxeles nítidos
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  const texture = Texture.from(canvas);
+  texture.source.scaleMode = "nearest";
+  const still: Anim = { frames: Array.from({ length: 8 }, () => [texture]), durations: [60] };
+  return { anims: { Walk: still, Idle: still, Sleep: { frames: [[texture]], durations: [60] } }, shadow: 1, body: opaqueBounds(texture) };
+}
+
+/**
+ * Devuelve un SpriteSet por clave ("6", "130/shiny"…) o null si no está disponible: nunca lanza.
+ * Si no hay sprite de Mundo Misterioso descargado y se da `fallback`, prueba con esa imagen fija.
+ */
+export async function loadSprites(keys: string[], fallback?: (key: string) => string | null): Promise<Map<string, SpriteSet | null>> {
   let available: string[] = [];
   try {
     available = (await (await fetch(`${BASE}manifest.json`)).json()).ok ?? [];
@@ -118,9 +140,10 @@ export async function loadSprites(keys: string[]): Promise<Map<string, SpriteSet
   }
   const entries = await Promise.all(
     [...new Set(keys)].map(async (key): Promise<[string, SpriteSet | null]> => {
-      if (!available.includes(key)) return [key, null];
       try {
-        return [key, await loadSet(key)];
+        if (available.includes(key)) return [key, await loadSet(key)];
+        const url = fallback?.(key);
+        return [key, url ? await loadStatic(url) : null];
       } catch (e) {
         console.warn(`Sprite ${key} no disponible:`, e);
         return [key, null];
