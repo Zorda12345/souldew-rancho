@@ -222,6 +222,40 @@ test('servidor: imágenes solo de las tres carpetas de RetroAchievements', async
   assert.equal((await fetch(`${base}/retroach/Badge/..%2F..%2Fx.png`)).status !== 200, true);
 });
 
+test('logros nuevos: la primera vez es el punto de partida; luego solo los que no se conocían, del más viejo al más nuevo', () => {
+  const r = (...ids) => ids.map((id) => ({ id }));
+  assert.deepEqual(ra.newUnlocks(r(3, 2, 1), undefined), { fresh: [], seen: [3, 2, 1] });
+  assert.deepEqual(ra.newUnlocks(r(5, 4, 3, 2), [3, 2, 1]), { fresh: r(4, 5), seen: [5, 4, 3, 2, 1] });
+  assert.deepEqual(ra.newUnlocks(r(), [3]).fresh, [], 'sin recientes no hay nada nuevo');
+  const many = Array.from({ length: ra.SEEN_KEEP + 50 }, (_, i) => ({ id: 1000 - i }));
+  assert.equal(ra.newUnlocks(many, []).seen.length, ra.SEEN_KEEP, 'no crece sin límite');
+});
+
+test('vigilante: sin avisos al empezar, uno por logro nuevo, ninguno sin páginas abiertas', async () => {
+  const events = [];
+  let listening = true;
+  const w = ra.createWatcher({ emit: (e, d) => events.push([e, d]), listening: () => listening });
+  ra.clearCache();
+  assert.equal((await w.check()).length, 0, 'lo que ya había no se avisa');
+  assert.equal(events.length, 0);
+
+  RECENT.unshift({ ...RECENT[0], AchievementID: 9, Title: 'Medalla Adoquín', Date: '2026-11-15 13:00:00', BadgeURL: '/Badge/900.png' });
+  ra.clearCache();
+  listening = false;
+  assert.equal((await w.check()).length, 0, 'sin nadie escuchando no pregunta');
+  listening = true;
+  assert.deepEqual((await w.check()).map((a) => a.id), [9]);
+  assert.equal(events.length, 1);
+  assert.equal(events[0][0], 'retroach');
+  assert.equal(events[0][1].unlocks[0].title, 'Medalla Adoquín');
+  assert.equal(events[0][1].unlocks[0].badge, '/retroach/Badge/900.png');
+
+  ra.clearCache();
+  assert.equal((await w.check()).length, 0, 'el mismo logro no se avisa dos veces');
+  assert.equal(events.length, 1);
+  RECENT.shift();
+});
+
 test('servidor: desconectar borra la clave', async () => {
   assert.deepEqual((await call('DELETE', '/api/retroach/link')).body, { ok: true, linked: false, user: null });
   assert.deepEqual((await call('GET', '/api/retroach/summary')).body, { ok: false, error: 'notLinked' });

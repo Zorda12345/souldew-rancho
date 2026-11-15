@@ -46,4 +46,8 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
   `retro` en NAV_ICONS, estilos `.ra-*` al final de `web/styles.css`): formulario para conectar (usuario + clave, pasos
   para sacarla), cuenta (avatar, Rich Presence, puntos, Perfil/Actualizar/Desconectar), juego actual (barra LCD y pared de
   insignias: conseguidas a color, el resto apagadas) y «Esta semana»; se refresca cada 60 s con la pestaña visible.
-  Textos `retro.*` en los 5 idiomas. Sigue: 3) avisos en directo de logros nuevos en cualquier pantalla.
+  Textos `retro.*` en los 5 idiomas. 3) avisos HECHA: `createWatcher` en retroach.mjs (cada 60 s, solo con páginas
+  abiertas en /api/events y tareas de fondo activas; misma caché que el resumen; `newUnlocks`: la 1ª vez con una cuenta
+  es el punto de partida, ids conocidos en `seen` del json, máx. 300) emite SSE `retroach` {user, unlocks}; `web/app.mjs`
+  lo convierte en `RetroToasts` (placa de los trofeos en azul, 8 s, clic -> #/retro) y lanza `window` 'retroach' para
+  que la vista se refresque. RetroAchievements TERMINADO.

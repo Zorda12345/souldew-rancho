@@ -475,6 +475,8 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
   };
   const watcher = new SaveWatcher(GEN4, emit);
   const live = new LiveBridge(emit);
+  // RetroAchievements (fork souldew-rancho): logros nuevos -> evento `retroach`, solo con páginas abiertas
+  const raWatch = retroach.createWatcher({ emit, listening: () => sseClients.size > 0 });
   // 3DS in souldew's own player (server/lib/ctr.mjs): one game at a time
   const ctr = new CtrSessions();
   // A battery save the host sends after its page has gone (closed right after saving in the game): stored where the
@@ -1712,6 +1714,7 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
   });
 
   server.on('close', () => {
+    raWatch.stop();
     ctr.stop();
     azahar?.stop();
     streamHub.close();
@@ -1728,6 +1731,7 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
         pokelinkApply().catch(() => {});
         live.start().catch((e) => console.warn('live bridge unavailable:', e.message));
         prefetchSprites().catch(() => {});
+        raWatch.start();
       }
       resolvePromise({ server, port: actual, url: `http://localhost:${actual}` });
     });

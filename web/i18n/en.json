@@ -1769,6 +1769,7 @@
   "retro.step1": "Sign in at retroachievements.org and open your settings.",
   "retro.step2": "Under “Keys”, copy your web API key.",
   "retro.step3": "Paste it here with your user name.",
+  "retro.unlocked": "RetroAchievements unlocked",
   "retro.user": "User name",
   "rnd.abilitiesFollowEvolutions": "Abilities follow evolutions",
   "rnd.abilitiesFollowMegaEvolutions": "Mega Evolutions keep the abilities",

@@ -119,6 +119,27 @@ function Recent({ list }) {
   </section>`;
 }
 
+/**
+ * Aviso de logro nuevo en cualquier pantalla: la misma placa que los trofeos de souldew (web/trophies.css), en azul.
+ * `items`: [{ key, a }] con `a` un logro de /api/retroach (title, description, points, badge, game, hardcore).
+ */
+export function RetroToasts({ items, dismiss, navigate }) {
+  if (!items.length) return null;
+  return html`<div class="trophy-toasts ra-toasts" role="status" aria-live="polite">
+    ${items.map(({ key, a }) => html`<button type="button" key=${key} class="trophy-toast ra-toast" onClick=${() => { dismiss(key); navigate('retro'); }}>
+      <span class="tt-glow" aria-hidden="true"></span>
+      ${a.badge ? html`<img class="ra-toast-badge" src=${a.badge} alt="" width="50" height="50" />` : html`<span class="ra-toast-badge"></span>`}
+      <span class="tt-text">
+        <span class="tt-kicker">${t('retro.unlocked', 'RetroAchievements unlocked')}</span>
+        <b>${a.title}</b>
+        <span class="tt-desc">${a.description}</span>
+        <span class="tt-desc faint">${a.game?.title}${a.hardcore ? ` · ${t('retro.hc', 'hardcore')}` : ''}</span>
+      </span>
+      <span class="rarity"><span class="num">+${a.points}</span></span>
+    </button>`)}
+  </div>`;
+}
+
 export function RetroView() {
   const [s, setS] = useState(null); // null = cargando
   const [busy, setBusy] = useState(false);
@@ -135,7 +156,12 @@ export function RetroView() {
   useEffect(() => {
     load();
     const id = setInterval(() => document.visibilityState === 'visible' && load(), REFRESH_MS);
-    return () => clearInterval(id);
+    // el servidor avisó de un logro nuevo (web/app.mjs, evento `retroach`)
+    window.addEventListener('retroach', load);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('retroach', load);
+    };
   }, []);
   const unlink = async () => {
     await api.del('/api/retroach/link');

@@ -222,8 +222,11 @@ export async function link({ user, key } = {}, opts = {}) {
   if (status !== 200) return { ok: false, error: status === 404 ? 'user' : errorOf(status) };
   const profile = profileOf(body);
   if (!profile.user) return { ok: false, error: 'user' };
-  // el nombre tal como lo escribe RetroAchievements (mayúsculas incluidas)
-  writeState({ ...readState(), user: validUser(profile.user) ? profile.user : user, key });
+  // el nombre tal como lo escribe RetroAchievements (mayúsculas incluidas); `seen` se olvida: con otra cuenta el
+  // vigilante vuelve a tomar como punto de partida lo que ya hay, sin avisar de logros viejos
+  const s = readState();
+  delete s.seen;
+  writeState({ ...s, user: validUser(profile.user) ? profile.user : user, key });
   clearCache();
   return { ok: true, ...publicState() };
 }
@@ -232,6 +235,7 @@ export function unlink() {
   const s = readState();
   delete s.user;
   delete s.key;
+  delete s.seen;
   writeState(s);
   clearCache();
   return { ok: true, ...publicState() };
@@ -255,6 +259,60 @@ export async function summary(opts = {}) {
     profile: profile.data,
     recent: recent.ok ? recent.data : [],
     game: game?.ok ? game.data : null,
+  };
+}
+
+// ---- vigilante: avisa de los logros nuevos mientras la app está abierta -------------------------------------------
+
+export const SEEN_KEEP = 300; // ids de logros recordados (los más nuevos)
+
+/**
+ * Qué logros de `recent` (el más nuevo primero) son nuevos frente a `seen` (ids ya conocidos). Sin `seen` (primera
+ * vez con esta cuenta) no hay nada nuevo: lo que ya había es el punto de partida. `fresh` va del más viejo al más nuevo.
+ */
+export function newUnlocks(recent, seen) {
+  const ids = recent.map((a) => a.id);
+  if (!Array.isArray(seen)) return { fresh: [], seen: ids.slice(0, SEEN_KEEP) };
+  const known = new Set(seen);
+  const fresh = recent.filter((a) => !known.has(a.id)).reverse();
+  return { fresh, seen: [...new Set([...ids, ...seen])].slice(0, SEEN_KEEP) };
+}
+
+/**
+ * Cada `interval` ms, si hay cuenta y alguien escuchando (`listening()`: páginas abiertas con /api/events), pide los
+ * logros recientes (la misma caché que el resumen) y emite `retroach` con los nuevos. Los errores se callan: la
+ * pestaña ya los enseña.
+ */
+export function createWatcher({ emit, listening = () => true, interval = CACHE_MS, opts = {} }) {
+  let timer = null;
+  let busy = false;
+  async function check() {
+    const a = account();
+    if (!a || busy || !listening()) return [];
+    busy = true;
+    try {
+      const r = await cached(`recent|${a.user}`, () => load('API_GetUserRecentAchievements', { m: 7 * 24 * 60 }, recentOf, opts));
+      if (!r.ok) return [];
+      const s = readState();
+      if (s.user !== a.user) return []; // se desconectó o cambió de cuenta mientras tanto
+      const { fresh, seen } = newUnlocks(r.data, s.seen);
+      writeState({ ...s, seen });
+      if (fresh.length) emit('retroach', { user: a.user, unlocks: fresh.slice(-5) });
+      return fresh;
+    } finally {
+      busy = false;
+    }
+  }
+  return {
+    check,
+    start() {
+      if (!timer) timer = setInterval(() => { check().catch(() => {}); }, interval);
+      timer.unref?.();
+    },
+    stop() {
+      clearInterval(timer);
+      timer = null;
+    },
   };
 }
 

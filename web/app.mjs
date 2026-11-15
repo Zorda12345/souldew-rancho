@@ -24,7 +24,7 @@ import { LinkView } from './views/link.mjs';
 import { SettingsView, gpuFallbackText } from './views/settings.mjs';
 import { GuideView } from './views/guide.mjs';
 import { RanchView } from './views/rancho.mjs';
-import { RetroView } from './views/retro.mjs';
+import { RetroView, RetroToasts } from './views/retro.mjs';
 import { StreamView } from './views/stream.mjs';
 import { useStreamer } from './lib/streamer.mjs';
 import { UpdateBanner } from './views/update.mjs';
@@ -188,6 +188,7 @@ function App() {
   const [externalRun, setExternalRun] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [trophyToasts, setTrophyToasts] = useState([]);
+  const [raToasts, setRaToasts] = useState([]); // logros nuevos de RetroAchievements (fork)
   const [deathAlert, setDeathAlert] = useState(null);
   const [restartOffer, setRestartOffer] = useState(null);
   const [runOver, setRunOver] = useState(null);
@@ -531,6 +532,13 @@ function App() {
     // a zipped 3DS game being unpacked into the library (server/lib/library.mjs unpackZipGames) – what came of it is
     // told by the page that added it (web/lib/libadded.mjs addedMessage, or the error)
     unpack: (p) => toast(unpackToast(p)),
+    // RetroAchievements (fork): un aviso por logro nuevo, y la pestaña se refresca si está abierta
+    retroach: (p) => {
+      const items = (p.unlocks || []).map((a) => ({ key: `ra-${a.id}`, a }));
+      setRaToasts((ts) => [...ts.filter((x) => !items.some((i) => i.key === x.key)), ...items].slice(-3));
+      for (const it of items) setTimeout(() => setRaToasts((ts) => ts.filter((x) => x.key !== it.key)), 8000);
+      window.dispatchEvent(new CustomEvent('retroach'));
+    },
   }), [runId]);
 
   // ---- live link -----------------------------------------------------------------
@@ -760,6 +768,7 @@ function App() {
     <${LicenseNag} open=${!!nag} launches=${nag?.launches} onClose=${() => setNag(null)} />
     <${Toasts} toasts=${toasts} dismiss=${(id) => setToasts((ts) => ts.filter((x) => x.id !== id))} />
     <${TrophyToasts} items=${trophyToasts} navigate=${navigate} dismiss=${(key) => setTrophyToasts((ts) => ts.filter((x) => x.key !== key))} />
+    <${RetroToasts} items=${raToasts} navigate=${navigate} dismiss=${(key) => setRaToasts((ts) => ts.filter((x) => x.key !== key))} />
     <${DeathAlert} alert=${runOver ? null : deathAlert} onClose=${() => setDeathAlert(null)} />
     <${RunOverNotice} status=${restartOffer ? null : runOver} onClose=${() => setRunOver(null)} />
     <${RestartOffer} offer=${restartOffer} onClose=${() => { try { sessionStorage.setItem(`sl-restart-seen-${restartOffer?.id}`, '1'); } catch {} setRestartOffer(null); }} />

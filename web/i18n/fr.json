@@ -2562,5 +2562,6 @@
   "retro.step2": "Sous « Keys », copie ta clé d’API web.",
   "retro.step3": "Colle-la ici avec ton nom d’utilisateur.",
   "retro.user": "Nom d’utilisateur",
-  "nav.retro": "Succès rétro"
+  "nav.retro": "Succès rétro",
+  "retro.unlocked": "Succès RetroAchievements"
 }
