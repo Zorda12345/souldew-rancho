@@ -156,8 +156,12 @@ export function createRanch(
   world.addChild(fx.layer);
   let battleKind: "king" | "duel" | null = null;
   let guests: Critter[] = []; // Pokémon de fuera de la caja traídos para un duelo
+  let trembling = 0; // amplitud del temblor de pantalla (px); se apaga sola
   const arena = new Arena(fx, AREA, {
     log: (text) => hooks.onBattleLog(text),
+    shake: (amount) => {
+      trembling = Math.max(trembling, amount);
+    },
     end: (winner) => {
       const kind = battleKind;
       const pokemon = winner?.pokemon ?? null;
@@ -291,6 +295,14 @@ export function createRanch(
     for (const guest of guests) guest.update(dt);
     if (arena.active) arena.update(dt);
     fx.update(dt);
+    // Temblor: se mueve todo el escenario unos píxeles al azar, cada vez menos.
+    if (trembling > 0.05) {
+      app.stage.position.set((Math.random() - 0.5) * 2 * trembling, (Math.random() - 0.5) * 2 * trembling);
+      trembling *= Math.exp(-14 * dt);
+    } else if (trembling > 0) {
+      trembling = 0;
+      app.stage.position.set(0, 0);
+    }
   });
 
   return {

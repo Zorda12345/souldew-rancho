@@ -80,6 +80,18 @@ export class Fx {
     });
   }
 
+  /** Dash: nubecillas de polvo que quedan atrás y se deshacen. */
+  dust(at: Point, dir: Point): void {
+    const g = new Graphics();
+    for (const [x, y, r] of [[0, 0, 3], [-dir.x * 5 - 2, -dir.y * 5 + 1, 2.4], [-dir.x * 9 + 2, -dir.y * 9, 1.8]]) g.circle(x, y, r);
+    g.fill({ color: 0xf2ead8, alpha: 0.85 });
+    g.position.set(at.x, at.y + 2);
+    this.add(g, 0.35, (t) => {
+      g.scale.set(1 + t * 0.8);
+      g.alpha = 1 - t;
+    });
+  }
+
   /** Texto flotante: el daño de un golpe, "falló"… */
   text(content: string, at: Point, color: number): void {
     const label = new Text({

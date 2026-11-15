@@ -1,4 +1,5 @@
 // Un Pokémon del rancho: su dibujo y su pequeña "máquina de estados".
+import { friction } from "../battle/motion.ts";
 import { Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
 import type { Pokemon } from "../data/schema.ts";
 import type { AnimName, SpriteSet } from "./sprites.ts";
@@ -48,6 +49,8 @@ export class Critter {
   private frame = 0;
   private frameTicks = 0;
   private age = rand(0, 10);
+  private knock = { vx: 0, vy: 0 }; // empujón de un golpe (px/s), se frena solo
+  private flashTime = 0; // segundos que le quedan del destello al recibir un golpe
 
   readonly pokemon: Pokemon;
   readonly set: SpriteSet | null;
@@ -144,6 +147,19 @@ export class Critter {
     this.timer -= dt;
     this.cooldown -= dt;
     this.age += dt;
+    if (this.knock.vx !== 0 || this.knock.vy !== 0) {
+      // Retroceso: se desliza hacia atrás frenando, sin salirse del prado.
+      this.view.x = Math.min(this.zone.x + this.zone.w, Math.max(this.zone.x, this.view.x + this.knock.vx * dt));
+      this.view.y = Math.min(this.zone.y + this.zone.h, Math.max(this.zone.y, this.view.y + this.knock.vy * dt));
+      this.knock.vx = friction(this.knock.vx, dt);
+      this.knock.vy = friction(this.knock.vy, dt);
+      if (Math.hypot(this.knock.vx, this.knock.vy) < 4) this.knock = { vx: 0, vy: 0 };
+    }
+    if (this.flashTime > 0) {
+      this.flashTime -= dt;
+      if (this.sprite) this.sprite.tint = this.flashTime > 0 ? 0xff7a7a : 0xffffff;
+      this.view.scale.set(this.flashTime > 0 ? 1.08 : 1, this.flashTime > 0 ? 0.92 : 1); // se aplasta un poco
+    }
     if (this.faint >= 0) {
       // Derrotado: parpadea cada vez más cerca del final y desaparece.
       this.faint -= dt;
@@ -320,6 +336,18 @@ export class Critter {
     const arrived = this.moveToTarget(dt);
     this.speed = own;
     return arrived;
+  }
+
+  /** Recibe un golpe: empujón (px/s en esa dirección) y destello rojo con un leve aplastamiento. */
+  hit(vx: number, vy: number): void {
+    this.knock.vx += vx;
+    this.knock.vy += vy;
+    this.flashTime = 0.14;
+  }
+
+  /** ¿Sigue retrocediendo por un golpe? Mientras tanto no puede moverse por su cuenta. */
+  get staggered(): boolean {
+    return this.knock.vx !== 0 || this.knock.vy !== 0;
   }
 
   stand(): void {
