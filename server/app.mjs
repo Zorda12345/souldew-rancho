@@ -37,6 +37,7 @@ import { LINKS } from '../shared/links.mjs';
 import { randomBytes } from 'node:crypto';
 import { syncTrophies } from './lib/trophies.mjs';
 import * as liveRuns from './lib/liveruns.mjs';
+import * as retroach from './lib/retroach.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -1482,6 +1483,15 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
     return liveRuns.post({ meta, image });
   });
 
+  // ---- RetroAchievements (fork souldew-rancho, server/lib/retroach.mjs): la clave se queda aquí ----
+  route('GET', /^\/api\/retroach$/, () => retroach.publicState());
+  route('GET', /^\/api\/retroach\/summary$/, () => retroach.summary());
+  route('POST', /^\/api\/retroach\/link$/, async (req) => {
+    const { user, key } = await readBody(req);
+    return retroach.link({ user, key });
+  });
+  route('DELETE', /^\/api\/retroach\/link$/, () => retroach.unlink());
+
   // ---- images: sprites & covers (cached, offline after first fetch) ------------------
   let spriteSources = null;
   const spriteUrl = (set, id) => {
@@ -1661,6 +1671,9 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
         const u = spriteUrl(sprite[1], Number(sprite[2]));
         return u ? serveCached(res, join(CACHE_DIR, 'sprites', sprite[1], `${sprite[2]}.${sprite[3]}`), u) : send(res, 404, 'unknown set');
       }
+      // avatar, insignias e iconos de RetroAchievements (públicos), con caché en disco
+      const raMedia = retroach.mediaUrl(path);
+      if (raMedia) return serveCached(res, join(CACHE_DIR, 'retroach', raMedia.file), raMedia.url);
       const cover = path.match(/^\/covers\/([a-z0-9-]+)\.png$/);
       if (cover) {
         const bundled = join(WEB_DIR, 'assets', 'covers', `${cover[1]}.png`);
