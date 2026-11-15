@@ -632,7 +632,7 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
       },
       gameName: (id) => {
         const g = (catalog().games || []).find((x) => x.id === id);
-        return g ? (lang === 'de' && g.titleDe) || g.title || null : null;
+        return g ? (lang === 'de' && g.titleDe) || (lang === 'es' && g.titleEs) || g.title || null : null; // titleEs: fork
       },
     };
   };

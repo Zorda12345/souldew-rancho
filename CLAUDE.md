@@ -51,3 +51,7 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
   es el punto de partida, ids conocidos en `seen` del json, máx. 300) emite SSE `retroach` {user, unlocks}; `web/app.mjs`
   lo convierte en `RetroToasts` (placa de los trofeos en azul, 8 s, clic -> #/retro) y lanza `window` 'retroach' para
   que la vista se refresque. RetroAchievements TERMINADO.
+- Versiones españolas de DS en `shared/data/catalog.json` (`pokemon-<juego>-es`, tras la alemana; códigos ADAS, APAS, CPUS,
+  IPKS, IPGS, IRBS, IRAS, IRES, IRDS; sin crc32 porque no está comprobado: se reconocen por código) con portadas en
+  `web/assets/covers/` y `titleEs` (usado en `gameTitle` de web/lib/data.mjs y `gameName` de server/app.mjs). UPR las admite.
+  El catálogo original solo traía inglés y alemán.

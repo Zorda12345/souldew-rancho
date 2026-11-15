@@ -118,7 +118,7 @@ export function patchLabel(p, all = [], nameOf = (id) => hackById(id)?.name) {
 }
 export function gameTitle(g) {
   if (!g) return '';
-  return (currentLang() === 'de' && g.titleDe) || g.title;
+  return (currentLang() === 'de' && g.titleDe) || (currentLang() === 'es' && g.titleEs) || g.title; // titleEs: fork
 }
 
 /** Per-run game data: generation, randomized types/evolutions per player. */

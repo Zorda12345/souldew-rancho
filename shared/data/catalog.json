@@ -1102,6 +1102,23 @@
    "variantOf": "pokemon-diamond"
   },
   {
+   "id": "pokemon-diamond-es",
+   "title": "Pokémon Diamond Version",
+   "titleEs": "Pokémon Edición Diamante",
+   "system": "nds",
+   "generation": 4,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Diamante (Spain) (Rev 5)",
+   "serial": "ADAS",
+   "releaseYear": 2007,
+   "color": "#5A7FA8",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Diamante%20(Spain)%20(Rev%205).png",
+   "coverLocal": "assets/covers/pokemon-diamond-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Diamante%20(Spain)%20(Rev%205).png",
+   "variantOf": "pokemon-diamond"
+  },
+  {
    "id": "pokemon-pearl-de",
    "title": "Pokémon Pearl Version",
    "titleDe": "Pokémon Perl-Edition",
@@ -1128,6 +1145,23 @@
    "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Perl-Edition%20%28Germany%29%20%28Rev%205%29.png",
    "coverLocal": "assets/covers/pokemon-pearl-de.png",
    "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Perl-Edition%20%28Germany%29%20%28Rev%205%29.png",
+   "variantOf": "pokemon-pearl"
+  },
+  {
+   "id": "pokemon-pearl-es",
+   "title": "Pokémon Pearl Version",
+   "titleEs": "Pokémon Edición Perla",
+   "system": "nds",
+   "generation": 4,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Perla (Spain) (Rev 5)",
+   "serial": "APAS",
+   "releaseYear": 2007,
+   "color": "#B07F92",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Perla%20(Spain)%20(Rev%205).png",
+   "coverLocal": "assets/covers/pokemon-pearl-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Perla%20(Spain)%20(Rev%205).png",
    "variantOf": "pokemon-pearl"
   },
   {
@@ -1160,6 +1194,23 @@
    "variantOf": "pokemon-platinum"
   },
   {
+   "id": "pokemon-platinum-es",
+   "title": "Pokémon Platinum Version",
+   "titleEs": "Pokémon Edición Platino",
+   "system": "nds",
+   "generation": 4,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Platino (Spain)",
+   "serial": "CPUS",
+   "releaseYear": 2009,
+   "color": "#6E6A75",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Platino%20(Spain).png",
+   "coverLocal": "assets/covers/pokemon-platinum-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Platino%20(Spain).png",
+   "variantOf": "pokemon-platinum"
+  },
+  {
    "id": "pokemon-heartgold-de",
    "title": "Pokémon HeartGold Version",
    "titleDe": "Pokémon Goldene Edition HeartGold",
@@ -1189,6 +1240,23 @@
    "variantOf": "pokemon-heartgold"
   },
   {
+   "id": "pokemon-heartgold-es",
+   "title": "Pokémon HeartGold Version",
+   "titleEs": "Pokémon Edición Oro HeartGold",
+   "system": "nds",
+   "generation": 4,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Oro HeartGold (Spain)",
+   "serial": "IPKS",
+   "releaseYear": 2010,
+   "color": "#B89A4A",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Oro%20HeartGold%20(Spain).png",
+   "coverLocal": "assets/covers/pokemon-heartgold-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Oro%20HeartGold%20(Spain).png",
+   "variantOf": "pokemon-heartgold"
+  },
+  {
    "id": "pokemon-soulsilver-de",
    "title": "Pokémon SoulSilver Version",
    "titleDe": "Pokémon Silberne Edition SoulSilver",
@@ -1215,6 +1283,23 @@
    "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Silberne%20Edition%20SoulSilver%20%28Germany%29.png",
    "coverLocal": "assets/covers/pokemon-soulsilver-de.png",
    "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Silberne%20Edition%20SoulSilver%20%28Germany%29.png",
+   "variantOf": "pokemon-soulsilver"
+  },
+  {
+   "id": "pokemon-soulsilver-es",
+   "title": "Pokémon SoulSilver Version",
+   "titleEs": "Pokémon Edición Plata SoulSilver",
+   "system": "nds",
+   "generation": 4,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Plata SoulSilver (Spain)",
+   "serial": "IPGS",
+   "releaseYear": 2010,
+   "color": "#8A95A3",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Plata%20SoulSilver%20(Spain).png",
+   "coverLocal": "assets/covers/pokemon-soulsilver-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Plata%20SoulSilver%20(Spain).png",
    "variantOf": "pokemon-soulsilver"
   },
   {
@@ -1359,6 +1444,23 @@
    "variantOf": "pokemon-black"
   },
   {
+   "id": "pokemon-black-es",
+   "title": "Pokémon Black Version",
+   "titleEs": "Pokémon Edición Negra",
+   "system": "nds",
+   "generation": 5,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Negra (Spain) (NDSi Enhanced)",
+   "serial": "IRBS",
+   "releaseYear": 2011,
+   "color": "#3A3A3E",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Negra%20(Spain)%20(NDSi%20Enhanced).png",
+   "coverLocal": "assets/covers/pokemon-black-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Negra%20(Spain)%20(NDSi%20Enhanced).png",
+   "variantOf": "pokemon-black"
+  },
+  {
    "id": "pokemon-white-de",
    "title": "Pokémon White Version",
    "titleDe": "Pokémon Weiße Edition",
@@ -1385,6 +1487,23 @@
    "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Weisse%20Edition%20%28Germany%29%20%28NDSi%20Enhanced%29.png",
    "coverLocal": "assets/covers/pokemon-white-de.png",
    "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Weisse%20Edition%20%28Germany%29%20%28NDSi%20Enhanced%29.png",
+   "variantOf": "pokemon-white"
+  },
+  {
+   "id": "pokemon-white-es",
+   "title": "Pokémon White Version",
+   "titleEs": "Pokémon Edición Blanca",
+   "system": "nds",
+   "generation": 5,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Blanca (Spain) (NDSi Enhanced)",
+   "serial": "IRAS",
+   "releaseYear": 2011,
+   "color": "#B5B2AA",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Blanca%20(Spain)%20(NDSi%20Enhanced).png",
+   "coverLocal": "assets/covers/pokemon-white-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Blanca%20(Spain)%20(NDSi%20Enhanced).png",
    "variantOf": "pokemon-white"
   },
   {
@@ -1417,6 +1536,23 @@
    "variantOf": "pokemon-black-2"
   },
   {
+   "id": "pokemon-black-2-es",
+   "title": "Pokémon Black Version 2",
+   "titleEs": "Pokémon Edición Negra 2",
+   "system": "nds",
+   "generation": 5,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Negra 2 (Spain) (NDSi Enhanced)",
+   "serial": "IRES",
+   "releaseYear": 2012,
+   "color": "#34404A",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Negra%202%20(Spain)%20(NDSi%20Enhanced).png",
+   "coverLocal": "assets/covers/pokemon-black-2-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Negra%202%20(Spain)%20(NDSi%20Enhanced).png",
+   "variantOf": "pokemon-black-2"
+  },
+  {
    "id": "pokemon-white-2-de",
    "title": "Pokémon White Version 2",
    "titleDe": "Pokémon Weiße Edition 2",
@@ -1443,6 +1579,23 @@
    "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Weisse%20Edition%202%20%28Germany%29%20%28NDSi%20Enhanced%29.png",
    "coverLocal": "assets/covers/pokemon-white-2-de.png",
    "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Weisse%20Edition%202%20%28Germany%29%20%28NDSi%20Enhanced%29.png",
+   "variantOf": "pokemon-white-2"
+  },
+  {
+   "id": "pokemon-white-2-es",
+   "title": "Pokémon White Version 2",
+   "titleEs": "Pokémon Edición Blanca 2",
+   "system": "nds",
+   "generation": 5,
+   "region": "Spain",
+   "noIntroName": "Pokemon - Edicion Blanca 2 (Spain) (NDSi Enhanced)",
+   "serial": "IRDS",
+   "releaseYear": 2012,
+   "color": "#A9A397",
+   "uprSupported": true,
+   "cover": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Boxarts/Pokemon%20-%20Edicion%20Blanca%202%20(Spain)%20(NDSi%20Enhanced).png",
+   "coverLocal": "assets/covers/pokemon-white-2-es.png",
+   "titleScreen": "https://raw.githubusercontent.com/libretro-thumbnails/Nintendo_-_Nintendo_DS/master/Named_Titles/Pokemon%20-%20Edicion%20Blanca%202%20(Spain)%20(NDSi%20Enhanced).png",
    "variantOf": "pokemon-white-2"
   },
   {
