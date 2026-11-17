@@ -5,8 +5,11 @@ import com.dabomstew.pkrandom.Settings;
 import com.dabomstew.pkrandom.pokemon.Encounter;
 import com.dabomstew.pkrandom.pokemon.EncounterSet;
 import com.dabomstew.pkrandom.pokemon.Evolution;
+import com.dabomstew.pkrandom.pokemon.MoveLearnt;
 import com.dabomstew.pkrandom.pokemon.Pokemon;
 import com.dabomstew.pkrandom.pokemon.StaticEncounter;
+import com.dabomstew.pkrandom.pokemon.Trainer;
+import com.dabomstew.pkrandom.pokemon.TrainerPokemon;
 import com.dabomstew.pkrandom.romhandlers.Gen4RomHandler;
 import com.dabomstew.pkrandom.romhandlers.Gen5RomHandler;
 import com.dabomstew.pkrandom.romhandlers.Gen6RomHandler;
@@ -32,10 +35,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Small bridge around Universal Pokemon Randomizer ZX that adds what its CLI lacks:
@@ -47,6 +55,10 @@ import java.util.ResourceBundle;
  *   java -cp PokeRandoZX.jar:bridge SoulLinkBridge info <rom>
  *   java -cp PokeRandoZX.jar:bridge SoulLinkBridge fields
  *   java -cp PokeRandoZX.jar:bridge SoulLinkBridge randomize <rom> <out.nds> <settings.properties> <seed> <log.txt> <data.json>
+ *   java -cp PokeRandoZX.jar:bridge SoulLinkBridge bosses <rom> <bosses.json>
+ *
+ * data.json also lists the game's important trainers ("bosses": rivals, gym leaders, Elite Four, champion) with their
+ * teams as the randomized ROM has them; `bosses` writes the same list ({"bosses":[…]}) from an already built ROM.
  *
  * 3DS games (Gen 6: X/Y, Omega Ruby/Alpha Sapphire; Gen 7: Sun/Moon, Ultra Sun/Ultra Moon) go through UPR ZX's own
  * Gen6/Gen7RomHandler: a decrypted .3ds/.cci/.cxi in, one rebuilt, self-contained .cxi out (the same file every
@@ -61,7 +73,7 @@ public class SoulLinkBridge {
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
-            System.err.println("usage: info <rom> | fields | randomize <rom> <out> <settings> <seed> <log> <json>");
+            System.err.println("usage: info <rom> | fields | randomize <rom> <out> <settings> <seed> <log> <json> | bosses <rom> <json>");
             System.exit(2);
         }
         try {
@@ -77,6 +89,12 @@ public class SoulLinkBridge {
                 o.close();
             } else if ("fields".equals(args[0])) {
                 fields();
+            } else if ("bosses".equals(args[0])) {
+                RomHandler h = load(args[1]);
+                Writer w = new OutputStreamWriter(new FileOutputStream(args[2]), StandardCharsets.UTF_8);
+                w.write("{\"bosses\":" + exportBosses(h) + "}");
+                w.close();
+                System.out.println("@@DONE " + json("bosses"));
             } else if ("randomize".equals(args[0])) {
                 randomize(args[1], args[2], args[3], Long.parseLong(args[4]), args[5], args[6]);
             } else {
@@ -452,8 +470,134 @@ public class SoulLinkBridge {
             first = false;
             sb.append('[').append(se.pkmn.number).append(',').append(se.level).append(']');
         }
-        sb.append("]}");
+        sb.append("],\"bosses\":").append(exportBosses(h)).append('}');
         return sb.toString();
+    }
+
+    /** UPR's tags of the important trainers: RIVALn-v (v: the starter the PLAYER chose, 0-2), GYMn-LEADER, ELITEn, CHAMPION. */
+    static final Pattern BOSS_TAG = Pattern.compile("^(?:RIVAL(\\d+)-(\\d+)|GYM(\\d+)-LEADER|ELITE(\\d+)|CHAMPION)$");
+    static final String[] BOSS_KINDS = { "rival", "gym", "elite", "champion" };
+
+    static int maxLevel(Trainer t) {
+        int max = 0;
+        for (TrainerPokemon tp : t.pokemon) max = Math.max(max, tp.level);
+        return max;
+    }
+
+    /**
+     * The bosses of one playthrough, in the order they are met. A tag can appear more than once (rematches after the
+     * League, the harder Challenge Mode copies of Black 2/White 2): the one with the lowest top level is kept (on a tie
+     * the lowest index), and nothing stronger than the champion. Order: top level, then rival < leader < Elite Four <
+     * champion. Never fails the build: an error gives an empty list.
+     */
+    static String exportBosses(RomHandler h) {
+        try {
+            return bossesJson(h);
+        } catch (RuntimeException e) {
+            System.out.println("@@WARN " + json("Could not read the bosses: " + e));
+            return "[]";
+        }
+    }
+
+    static String bossesJson(RomHandler h) {
+        Map<String, Trainer> byTag = new LinkedHashMap<String, Trainer>();
+        for (Trainer t : h.getTrainers()) {
+            if (t.tag == null || t.pokemon == null || t.pokemon.isEmpty() || !BOSS_TAG.matcher(t.tag).matches()) continue;
+            Trainer prev = byTag.get(t.tag);
+            if (prev == null || maxLevel(t) < maxLevel(prev) || (maxLevel(t) == maxLevel(prev) && t.index < prev.index)) byTag.put(t.tag, t);
+        }
+        Trainer champion = byTag.get("CHAMPION");
+        int cap = champion != null ? maxLevel(champion) : Integer.MAX_VALUE;
+        final Map<Trainer, int[]> info = new LinkedHashMap<Trainer, int[]>(); // kind, number, variant, top level
+        for (Trainer t : byTag.values()) {
+            int top = maxLevel(t);
+            if (top > cap) continue;
+            Matcher m = BOSS_TAG.matcher(t.tag);
+            m.matches();
+            int kind, n = 0, v = -1;
+            if (m.group(1) != null) { kind = 0; n = Integer.parseInt(m.group(1)); v = Integer.parseInt(m.group(2)); }
+            else if (m.group(3) != null) { kind = 1; n = Integer.parseInt(m.group(3)); }
+            else if (m.group(4) != null) { kind = 2; n = Integer.parseInt(m.group(4)); }
+            else kind = 3;
+            if (kind == 1 && n > 8) continue;
+            info.put(t, new int[]{ kind, n, v, top });
+        }
+        List<Trainer> list = new ArrayList<Trainer>(info.keySet());
+        Comparator<Trainer> order = (a, b) -> {
+            int[] x = info.get(a), y = info.get(b);
+            for (int i : new int[]{ 3, 0, 1, 2 }) if (x[i] != y[i]) return x[i] - y[i];
+            return 0;
+        };
+        Collections.sort(list, order);
+
+        List<Move> moves = h.getMoves();
+        String[] items = h.getItemNames();
+        Map<Integer, List<MoveLearnt>> learnt = h.getMovesLearnt();
+        StringBuilder sb = new StringBuilder("[");
+        boolean first = true;
+        for (Trainer t : list) {
+            int[] x = info.get(t);
+            if (!first) sb.append(',');
+            first = false;
+            sb.append("{\"kind\":").append(json(BOSS_KINDS[x[0]]))
+              .append(",\"number\":").append(x[1])
+              .append(",\"variant\":").append(x[2] < 0 ? "null" : String.valueOf(x[2]))
+              .append(",\"tag\":").append(json(t.tag))
+              .append(",\"index\":").append(t.index)
+              .append(",\"name\":").append(json(t.fullDisplayName != null ? t.fullDisplayName : t.name))
+              .append(",\"level\":").append(x[3])
+              .append(",\"team\":[");
+            boolean f2 = true;
+            for (TrainerPokemon tp : t.pokemon) {
+                if (tp.pokemon == null) continue;
+                if (!f2) sb.append(',');
+                f2 = false;
+                Pokemon species = tp.pokemon;
+                if (tp.forme > 0) {
+                    Pokemon forme = h.getAltFormeOfPokemon(tp.pokemon, tp.forme);
+                    if (forme != null) species = forme;
+                }
+                sb.append("{\"id\":").append(tp.pokemon.number)
+                  .append(",\"forme\":").append(tp.forme)
+                  .append(",\"name\":").append(json(species.fullName()))
+                  .append(",\"level\":").append(tp.level)
+                  .append(",\"item\":").append(tp.heldItem > 0 && tp.heldItem < items.length ? json(items[tp.heldItem]) : "null");
+                boolean custom = false;
+                for (int mv : tp.moves) if (mv > 0) custom = true;
+                List<Integer> ids = new ArrayList<Integer>();
+                if (custom) {
+                    for (int mv : tp.moves) if (mv > 0) ids.add(mv);
+                } else {
+                    List<MoveLearnt> learnset = learnt.get(species.number);
+                    if (learnset == null) learnset = learnt.get(tp.pokemon.number);
+                    ids = defaultMoves(learnset, tp.level);
+                }
+                sb.append(",\"defaultMoves\":").append(!custom).append(",\"moves\":[");
+                boolean f3 = true;
+                for (int mv : ids) {
+                    if (mv <= 0 || mv >= moves.size() || moves.get(mv) == null) continue;
+                    if (!f3) sb.append(',');
+                    f3 = false;
+                    sb.append(json(moves.get(mv).name));
+                }
+                sb.append("]}");
+            }
+            sb.append("]}");
+        }
+        return sb.append(']').toString();
+    }
+
+    /** A trainer Pokémon without its own moves knows what the game gives it: the last 4 different moves learnt by level up to its level. */
+    static List<Integer> defaultMoves(List<MoveLearnt> learnset, int level) {
+        LinkedList<Integer> last = new LinkedList<Integer>();
+        if (learnset == null) return last;
+        for (MoveLearnt ml : learnset) {
+            if (ml.level > level) break;
+            if (last.contains(ml.move)) continue;
+            last.add(ml.move);
+            if (last.size() > 4) last.removeFirst();
+        }
+        return last;
     }
 
     /** How many files the loaded 3DS game's romfs has (UPR's NCCH keeps them private) – -1 if that can't be read. */

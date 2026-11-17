@@ -55,3 +55,11 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
   IPKS, IPGS, IRBS, IRAS, IRES, IRDS; sin crc32 porque no está comprobado: se reconocen por código) con portadas en
   `web/assets/covers/` y `titleEs` (usado en `gameTitle` de web/lib/data.mjs y `gameName` de server/app.mjs). UPR las admite.
   El catálogo original solo traía inglés y alemán.
+- Jefes de la run (2 fases, parar tras cada una): 1) puente HECHA: `exportBosses` en `tools/upr-bridge/SoulLinkBridge.java`
+  añade `bosses` a `pN.data.json` al aleatorizar; `bosses <rom> <out.json>` los saca de una ROM ya hecha. Etiquetas de UPR
+  `RIVALn-v` (v = inicial que eligió el JUGADOR, 0-2), `GYMn-LEADER` (n ≤ 8), `ELITEn`, `CHAMPION`; por etiqueta el de menor
+  nivel máximo (fuera revanchas y modo Desafío), nada por encima del campeón; orden por nivel y rival < líder < Alto Mando <
+  campeón. Cada Pokémon: `id`, `forme`, `name`, `level`, `item`, `moves` (nombres de la ROM; si no trae, los 4 últimos
+  aprendidos por nivel, `defaultMoves: true`). Negro 2: 37 jefes; Platino: 34 (test en `test/randomizer.test.mjs`, necesita
+  la ROM en `library/`). Compilar: `javac --release 8 -encoding UTF-8 -cp "tools/upr/PokeRandoZX.jar;tools/upr-bridge" -d tools/upr-bridge tools/upr-bridge/SoulLinkBridge.java`.
+  2) interfaz: pendiente.

@@ -186,3 +186,39 @@ test('the UPR settings snapshot matches the bundled UPR', { skip: !canRunBridge 
   const res = await runBridge(['fields'], { timeoutMs: 60000 });
   assert.deepEqual(res.json, UPR);
 });
+
+// The bosses the bridge reads from a ROM (data.json "bosses" / the `bosses` command). Needs Java and a Black 2 or
+// Platinum ROM in library/ (the player's own, never in the repo) – skipped otherwise.
+const { readdirSync, mkdtempSync, rmSync } = await import('node:fs');
+const { tmpdir } = await import('node:os');
+const libRom = (re) => {
+  try {
+    const f = readdirSync(join(root, 'library')).find((n) => re.test(n));
+    return f ? join(root, 'library', f) : null;
+  } catch { return null; }
+};
+for (const [game, re, firstLeader, champion, count] of [
+  ['Black 2', /negra 2|black (version )?2/i, 'GYM1-LEADER', 59, 37],
+  ['Platinum', /platin/i, 'GYM1-LEADER', 62, 34],
+]) {
+  const rom = libRom(re);
+  test(`bridge lists the bosses of ${game}`, { skip: (!canRunBridge || !rom) && `no Java / ${game} ROM here` }, async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'souldew-bosses-'));
+    try {
+      const out = join(dir, 'bosses.json');
+      await runBridge(['bosses', rom, out], { timeoutMs: 60000 });
+      const { bosses } = JSON.parse(readFileSync(out, 'utf8'));
+      assert.equal(bosses.length, count);
+      assert.equal(new Set(bosses.map((b) => b.tag)).size, count, 'one trainer per tag');
+      assert.deepEqual(bosses.filter((b) => b.kind === 'gym').map((b) => b.number), [1, 2, 3, 4, 5, 6, 7, 8]);
+      assert.equal(bosses.at(-1).kind, 'champion');
+      assert.equal(bosses.at(-1).level, champion);
+      for (let i = 1; i < bosses.length; i++) assert.ok(bosses[i].level >= bosses[i - 1].level, 'ordered by level');
+      assert.ok(bosses.filter((b) => b.kind === 'rival').every((b) => [0, 1, 2].includes(b.variant)));
+      for (const b of bosses) for (const p of b.team) assert.ok(p.moves.length >= 1 && p.moves.length <= 4, `${b.tag} ${p.name}`);
+      assert.ok(bosses.some((b) => b.tag === firstLeader));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+}
