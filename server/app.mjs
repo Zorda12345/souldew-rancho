@@ -39,6 +39,7 @@ import { syncTrophies } from './lib/trophies.mjs';
 import * as liveRuns from './lib/liveruns.mjs';
 import * as retroach from './lib/retroach.mjs';
 import { pmdUrl } from './lib/pmd.mjs';
+import { runBosses } from './lib/bosses.mjs';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
@@ -1175,6 +1176,8 @@ export function startServer({ port = 7373, host = '127.0.0.1', background = true
     const p = join(runDir(m[1]), `${m[2]}.data.json`);
     return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null;
   });
+  // the player's bosses read from their ROM (fork: server/lib/bosses.mjs) – null when this computer doesn't have it
+  route('GET', /^\/api\/runs\/([a-f0-9]{8})\/bosses\/(p[1-4])$/, (req, m) => runBosses(m[1], m[2]));
   route('GET', /^\/api\/runs\/([a-f0-9]{8})\/log\/(p[1-4])$/, (req, m) => {
     const name = readManifest(m[1])?.outputs?.[m[2]]?.log;
     const p = name ? runPath(m[1], name) : null;

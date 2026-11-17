@@ -92,7 +92,9 @@ public class SoulLinkBridge {
             } else if ("bosses".equals(args[0])) {
                 RomHandler h = load(args[1]);
                 Writer w = new OutputStreamWriter(new FileOutputStream(args[2]), StandardCharsets.UTF_8);
-                w.write("{\"bosses\":" + exportBosses(h) + "}");
+                StringBuilder starters = new StringBuilder();
+                for (Pokemon p : h.getStarters()) starters.append(starters.length() > 0 ? "," : "").append(p.number);
+                w.write("{\"starters\":[" + starters + "],\"bosses\":" + exportBosses(h) + "}");
                 w.close();
                 System.out.println("@@DONE " + json("bosses"));
             } else if ("randomize".equals(args[0])) {

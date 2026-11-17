@@ -62,4 +62,13 @@ El remoto `upstream` apunta al original para traer sus versiones nuevas.
   campeón. Cada Pokémon: `id`, `forme`, `name`, `level`, `item`, `moves` (nombres de la ROM; si no trae, los 4 últimos
   aprendidos por nivel, `defaultMoves: true`). Negro 2: 37 jefes; Platino: 34 (test en `test/randomizer.test.mjs`, necesita
   la ROM en `library/`). Compilar: `javac --release 8 -encoding UTF-8 -cp "tools/upr/PokeRandoZX.jar;tools/upr-bridge" -d tools/upr-bridge tools/upr-bridge/SoulLinkBridge.java`.
-  2) interfaz: pendiente.
+  El comando `bosses` también escribe `starters`.
+  2) interfaz HECHA: regla `bosses` (apagada si no está; casilla en el asistente de creación junto a la ayuda de tipos y en
+  Reglas › Ayuda en combate, `BossRule`). Servidor `server/lib/bosses.mjs` + `GET /api/runs/:id/bosses/:slot`: de
+  `data.json` o, en runs antiguas/sin randomizer, lee la ROM de la run con el puente y lo guarda en `<slot>.bosses.json`
+  (no 3DS). Web `web/lib/bosses.mjs` (claves del doc compartido `rbosses:<slot>` {starters, list}, `rbwin:<slot>:<clave>`,
+  `rbstarter:<slot>`; variante del rival por la familia de la captura del área `starter` o elección manual; `defeatBoss`
+  escribe en el registro tipo `boss` «X ha derrotado a Y») y `web/views/bosses.mjs` (`PlayBoss` en la pantalla de juego bajo
+  el tope de nivel, `BossStrip` en «En directo», pestaña «Jefes» `BossesTab` con `<details>` como spoiler y oculto en modo
+  streamer; «Derrotado» con confirmación y deshacer, solo en el ordenador de ese jugador). Estilos `.boss-*` al final de
+  `web/styles.css`, textos `bosses.*` y `feed.bossDefeated*`, test `test/bosses.test.mjs`. Jefes TERMINADO.

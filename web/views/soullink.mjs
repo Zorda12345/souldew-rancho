@@ -16,6 +16,7 @@ import { suggestSlot } from '../lib/invitecode.mjs';
 import { Board, InviteBody } from './board.mjs';
 import { JoinCode } from './invitecode.mjs';
 import { NuzlockeRules, TypeHelpRule } from './nuzrules.mjs';
+import { BossRule } from './bosses.mjs'; // fork: bosses of the run
 import { FirstSteps } from './firststeps.mjs';
 
 /**
@@ -506,6 +507,7 @@ function NewRun({ gameId, hackId, patchPick, romPick, from, mode: sectionMode })
   const [nzRules, setNzRules] = useState(() => (from && runMode(from) === 'nuzlocke' && from.rules ? { ...NUZLOCKE_RULES, ...from.rules } : { ...NUZLOCKE_RULES }));
   // the host's call for everyone: the battle helper's type matchups (a restart keeps the old run's choice)
   const [typeHelp, setTypeHelp] = useState(() => from?.rules?.typeHelp !== false);
+  const [bosses, setBosses] = useState(() => from?.rules?.bosses === true); // fork: bosses of the run
   const [seedMode, setSeedMode] = useState(from?.randomizer?.sharedSeed ? 'shared' : 'separate');
   const [seeds, setSeeds] = useState(() => Object.fromEntries(ALL_SLOTS.map((s) => [s, randomSeed()])));
   const [names, setNames] = useState(() => (from ? namesFrom(from, status?.config?.playerName || '') : { p1: status?.config?.playerName || '', p2: '', p3: '', p4: '' }));
@@ -581,7 +583,7 @@ function NewRun({ gameId, hackId, patchPick, romPick, from, mode: sectionMode })
         gameId: game?.variantOf || game?.id || null, gameTitle: hack?.name || customHack || (game ? gameTitle(game) : rom.title), hackId: hack?.id || null,
         hackName: !hack && customHack ? customHack : undefined,
         name: numberedName(defaultRunName(players, mode), status?.runs),
-        rules: { ...(solo ? nzRules : from && runMode(from) === 'soullink' ? from.rules || {} : {}), typeHelp },
+        rules: { ...(solo ? nzRules : from && runMode(from) === 'soullink' ? from.rules || {} : {}), bosses, typeHelp },
       });
       setLog(res.log);
       await reloadStatus();
@@ -720,6 +722,7 @@ function NewRun({ gameId, hackId, patchPick, romPick, from, mode: sectionMode })
         : html`<p class="small muted">${count > 2 ? t('new.rulesHintGroup', 'Type rule, dupes clause, level caps and the rest are set together on the board (Rules tab). This one is yours as the host – it applies to everyone, and only you can change it later.')
           : t('new.rulesHintLink', 'Type rule, dupes clause, level caps and the rest are set together on the board (Rules tab). This one is yours as the host – it applies to both of you, and only you can change it later.')}</p>`}
       <div class=${solo ? 'rule-sep' : ''}><${TypeHelpRule} value=${typeHelp} solo=${solo} onChange=${setTypeHelp} /></div>
+      <${BossRule} value=${bosses} onChange=${setBosses} />
     </section>
 
     <section class="panel stack">

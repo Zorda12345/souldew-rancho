@@ -17,6 +17,8 @@ import { useStreamer } from '../lib/streamer.mjs';
 import { NuzlockeRules, Choice, TypeHelpRule } from './nuzrules.mjs';
 import { ShareButton } from './liveshare.mjs';
 import { deathEvent } from '../lib/liveshare.mjs';
+import { BossStrip, BossesTab, BossRule } from './bosses.mjs'; // fork: bosses of the run
+import { bossesOn } from '../lib/bosses.mjs';
 
 
 /** Is `slot` connected right now? Per player once the app tracks it (`onlineSlots`), before that "any partner". */
@@ -51,6 +53,7 @@ export function Board() {
     ['live', t('board.live', 'Live')], ['routes', t('board.routes', 'Routes')], ['graves', t('board.graves', 'Graveyard')],
     ['log', t('board.log', 'Log')], ['stats', t('board.stats', 'Stats')], ['rules', t('board.rules', 'Rules')], ['spoiler', t('board.spoiler', 'Spoiler')],
   ];
+  if (bossesOn(getRules(doc, manifest))) TABS.splice(4, 0, ['bosses', t('bosses.tab', 'Bosses')]); // fork
   return html`<div data-v=${docVersion}>
     <${BoardHead} counts=${c} />
     <div class="tabbar"><div class="tabs" role="tablist" data-pad-tabs>
@@ -68,6 +71,7 @@ export function Board() {
     ${tab === 'stats' && html`<${StatsTab} />`}
     ${tab === 'rules' && html`<${RulesTab} />`}
     ${tab === 'spoiler' && html`<${SpoilerTab} />`}
+    ${tab === 'bosses' && html`<${BossesTab} />`}
   </div>`;
 }
 
@@ -394,6 +398,7 @@ function LiveTab({ warnings }) {
   return html`<div class="stack-l">
     <${Inbox} />
     <${Warnings} list=${warnings} />
+    <${BossStrip} />
     ${empty
       ? html`<div class="panel empty-state"><${Icon} name="play" size=${56} /><h2>${t('board.emptyTitle', 'No team yet')}</h2>
           <p class="muted prose">${solo ? t('board.emptyTextSolo', 'Start the game – as soon as you have Pokémon, your team appears here live.')
@@ -888,6 +893,7 @@ export function RulesTab() {
       <h2>${t('rules.battleHelp', 'Battle help')}</h2>
       <${TypeHelpRule} value=${r.typeHelp} solo=${solo} locked=${!isHost(me)} hostName=${getPlayers(doc, manifest)[HOST_SLOT]?.name}
         onChange=${(v) => set({ typeHelp: v })} />
+      <${BossRule} value=${r.bosses} onChange=${(v) => set({ bosses: v })} />
     </section>
     <section class="panel stack">
       <h2>${t('rules.auto', 'Automatic')}</h2>

@@ -1537,3 +1537,43 @@ html.pad-nav .cart:focus .cart-title { color: var(--focus); }
   animation: tt-pop .7s cubic-bezier(.2,1.6,.4,1) .15s both; }
 @media (prefers-reduced-motion: reduce) { .ra-toast-badge { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .ra-bar i { transition: none; } }
+
+/* Fork souldew-rancho: bosses of the run (web/views/bosses.mjs) – next boss per player and the "Bosses" tab */
+.boss-cards, .boss-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.boss-card { display: grid; align-content: start; gap: 8px; padding: 12px 14px; border-radius: var(--r-l); background: var(--shell-3);
+  border: 1px solid var(--edge); border-top: 3px solid var(--c, var(--edge-hi)); }
+.boss-card.compact { padding: 10px 12px; background: var(--shell-2); }
+.boss-card.compact .boss-team { grid-template-columns: 1fr; }
+.boss-card > .btn { justify-self: start; }
+.boss-col { display: grid; align-content: start; gap: 10px; border-top: 3px solid var(--c, var(--edge-hi)); }
+.boss-who { display: flex; align-items: baseline; gap: 8px; margin: 0; font-size: 13px; font-weight: 600; color: var(--c, var(--ink)); }
+.boss-count { margin-left: auto; font-size: 12px; font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.boss-name { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 15px; }
+.boss-lv { font-size: 12px; font-weight: 400; color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip.boss-kind { font-weight: 600; white-space: nowrap; }
+.chip.boss-kind.rival { color: var(--warn-ink); }
+.chip.boss-kind.gym { color: var(--ok-ink); }
+.chip.boss-kind.elite { color: #c9b8f2; }
+.chip.boss-kind.champion { color: var(--bad-ink); }
+.boss-team { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.boss-mon { display: flex; gap: 6px; padding: 6px; border-radius: var(--r-m, 8px); background: var(--shell); border: 1px solid var(--edge); }
+.boss-mon .sprite { flex: none; }
+.boss-mon-text { min-width: 0; }
+.boss-mon p { margin: 0; font-size: 13px; }
+.boss-item { display: block; font-size: 11.5px; color: var(--warn-ink); }
+.boss-moves { margin: 3px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--ink-2); }
+.boss-moves .none { font-style: italic; }
+.boss-confirm { flex-wrap: wrap; gap: 6px; }
+.boss-starter .btn { gap: 4px; }
+.boss-list { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.boss-row details, .boss-row .boss-summary { border-radius: var(--r-m, 8px); background: var(--shell); border: 1px solid var(--edge); }
+.boss-row summary, .boss-row .boss-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 7px 10px; font-size: 14px; }
+.boss-row summary { cursor: pointer; }
+.boss-row details > :not(summary) { margin: 0 8px 8px; }
+.boss-state { margin-left: auto; font-size: 12px; color: var(--ink-3); }
+.boss-row.done summary { opacity: 0.7; }
+.boss-row.done .boss-state { color: var(--ok-ink); }
+.boss-row.next details { border-color: var(--c, var(--edge-hi)); }
+.boss-row.next .boss-state { color: var(--c, var(--ink)); font-weight: 600; }
+.boss-row.spoiler .boss-state { font-style: italic; }
+.feed-item.boss .k { background: var(--warn); }
